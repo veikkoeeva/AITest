@@ -1,0 +1,38 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "omnisharp.enableAsyncCompletion": true,
+        "omnisharp.useModernNet": true,
+        "interactiveWindow.collapseCellInputCode": "always",
+        "notebook.showFoldingControls": "always",
+        "notebook.cellToolbarVisibility": "hover",
+        "notebook.cellFocusIndicator": "border",
+        "notebook.diff.ignoreMetadata": false,
+        "notebook.diff.ignoreOutputs": true,
+        "notebook.dragAndDropEnabled": false,
+        "notebook.lineNumbers": "on",
+        "notebook.outline.showCodeCells": true,
+        "notebook.diff.enablePreview": false,
+        "notebook.consolidatedOutputButton": false,
+        "notebook.compactView": false,
+        "notebook.output.textLineLimit": 50,
+        "vsicons.associations.files": [
+            { "icon": "pddl_happenings", "extensions": ["dib"], "format": "svg" }
+        ],
+        "files.exclude": {
+            "**/.gitattributes": true,
+            "**/.gitignore": true,
+            "**/*.code-workspace": false
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "vscode-icons-team.vscode-icons",
+            "ms-dotnettools.dotnet-interactive-vscode",
+        ]
+    }
+}

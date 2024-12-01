@@ -1,0 +1,32 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageVersion Include="dotNetRdf" Version="3.3.0" />
+    <PackageVersion Include="Microsoft.ML.OnnxRuntimeGenAI.Managed" Version="0.5.2" />
+    <PackageVersion Include="Microsoft.ML.OnnxRuntimeGenAI" Version="0.5.2" />
+    <PackageVersion Include="Microsoft.ML.OnnxRuntime" Version="1.20.1" />
+    <PackageVersion Include="Microsoft.ML.Probabilistic" Version="0.4.2403.801" />
+    <PackageVersion Include="Microsoft.ML.Probabilistic.Learners" Version="0.4.2403.801" />
+    <PackageVersion Include="Microsoft.SemanticKernel" Version="1.33.0" />
+    <PackageVersion Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.28.0-alpha" />
+    <PackageVersion Include="DuckDB.NET.Bindings.Full" Version="1.1.3" />
+    <PackageVersion Include="System.Collections.Immutable" Version="9.0.0" />
+    <PackageVersion Include="System.Net.Http.Json" Version="9.0.0" />
+    <PackageVersion Include="System.Speech" Version="9.0.1" />
+    <PackageVersion Include="System.Text.Json" Version="9.0.0" />
+    <PackageVersion Include="WinSharpFuzz" Version="1.0.0" />
+    <PackageVersion Include="CsCheck" Version="4.1.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="9.0.1" />
+    <PackageVersion Include="System.Net.ServerSentEvents" Version="9.0.1" />
+    <PackageVersion Include="Microsoft.Maui.Controls" Version="9.0.30" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="9.0.1" />
+  </ItemGroup>
+</Project>
