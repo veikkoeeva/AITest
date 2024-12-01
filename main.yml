@@ -1,0 +1,129 @@
+name: AITest Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+      - "**.md"  
+
+  schedule:
+  # A daily build to check all is still functioning.
+  - cron: "0 0 * * *"
+
+env:    
+  DOTNET_ENVIRONMENT: CI
+  BUILD_CONFIGURATION: Release
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+  NUGET_XMLDOC_MODE: skip
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+  GITHUB_USER: ${{ github.repository_owner }}
+  GITHUB_FEED: https://nuget.pkg.github.com/lumoin/
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    steps:
+    
+    - name: Harden Runner
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f
+      with:
+        disable-sudo: true
+        egress-policy: block
+        allowed-endpoints: >
+          dotnetbuilds.azureedge.net:443
+          aka.ms:443
+          api.github.com:443
+          api.nuget.org:443
+          pkgs.dev.azure.com:443
+          dashboard.stryker-mutator.io:443
+          dotnetcli.azureedge.net:443
+          github.com:443
+          nuget.pkg.github.com:443            
+          api.clearlydefined.io:443
+          cacerts.digicert.com:80
+          ts-crl.ws.symantec.com:80          
+          crl3.digicert.com:80
+          crl4.digicert.com:80
+          s.symcb.com:80
+          ocsp.digicert.com:80    
+
+    - name: Checkout code
+      uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+      with:
+        fetch-depth: 0
+        fetch-tags: true
+            
+    - name: Cache Nuget packages '${{ matrix.os }}'
+      uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a
+      with:
+        path: ${{ env.NUGET_PACKAGES }}
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: |
+          ${{runner.os}}-nuget-
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25
+      with:
+        global-json-file: global.json
+
+    - name: Install dependencies
+      run: dotnet restore --locked-mode
+
+    - name: Restore local .NET tools
+      run: dotnet tool restore
+
+    - name: Add Problem Matcher for dotnet-format
+      uses: xt0rted/dotnet-format-problem-matcher@b90c4f18e3daa4f8fd266e41eba4f351b2e00b75
+                
+    - name: Build
+      # At the moment AITests.Tests cannot be built with -isolate alone due to Coverlet.
+      run: dotnet build --binaryLogger --tl --graphBuild -isolate:MessageUponIsolationViolation --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --property:ContinuousIntegrationBuild=true --property:Version=${{ env.VERSION }} --property:InformationalVersion=${{ env.PACKAGE_VERSION }} --property:AssemblyVersion=${{ env.TAG_VERSION }} --property:FileVersion=${{ env.TAG_VERSION }}
+      timeout-minutes: 5
+    
+    # MacOS is skipped at the moment due to issues with some .NET crypto libraries.
+    # Until tests are a fixed a bit. The coverage from the executable does not have a file suffix in Linux.
+    - name: Test      
+      run: dotnet tool run dotnet-coverage collect --output '${{ github.workspace }}/reports/coverage.cobertura.xml' --output-format cobertura '${{ github.workspace }}/test/${{ env.VERIFIABLE_TESTS }}/bin/${{ env.BUILD_CONFIGURATION }}/net9.0/${{ env.VERIFIABLE_TESTS }}' --report-trx --report-trx-filename testresults.trx --results-directory '${{ github.workspace }}/reports'
+      timeout-minutes: 5
+    
+    # - name: Run Benchmarks
+    #  run: dotnet "./publish/Verifiable.Benchmarks.dll" -f "Verifiable.Benchmarks.*"
+
+    # - name: Upload benchmark results
+    #  uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
+    #  with:
+    #    name: Benchmark_Results
+    #    path: ./BenchmarkDotNet.Artifacts/results/*
+
+    - name: Create test summary
+      if: ${{ matrix.os == 'ubuntu-latest' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
+      uses: EnricoMi/publish-unit-test-result-action@170bf24d20d201b842d7a52403b73ed297e6645b      
+      with:
+        trx_files: '${{ github.workspace }}/reports/**/*.trx'
+
+    - name: Publish coverage summary
+      if: ${{ matrix.os == 'ubuntu-latest' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
+      uses: marocchino/sticky-pull-request-comment@331f8f5b4215f0445d3c07b4967662a32a2d3e31
+      with:
+        header: Report
+        path: '${{ github.workspace }}/reports/coverage/Summary.md'
+        recreate: true     
+    # - name: The sbom-tool does not generate the output directory and fails if it not present.
+    - name: Create SBOM output directory
+      run: mkdir -p "${{ github.workspace }}/${{ matrix.os }}/sbom/"
+
+    # There may a difference in libraries between platforms, so the tool is being run on all platforms.
+    - name: Run BOM analysis
+      run: dotnet tool run sbom-tool generate -DeleteManifestDirIfPresent true -BuildDropPath "${{ github.workspace }}/${{ matrix.os }}/sbom/" -FetchLicenseInformation true -EnablePackageMetadataParsing true -BuildComponentPath . -PackageName "Verifiable" -PackageSupplier "Lumoin" -NamespaceUriBase "https://aitest.xyz/aitest" -PackageVersion 1.0.0 -Verbosity Verbose
