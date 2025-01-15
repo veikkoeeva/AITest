@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=75.8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aitest_python_notebooks"
+version = "0.1.0"
+description = "A Python environment for Jupyter notebooks integrated with a .NET project."
+authors = [
+    { name = "Veikko Eeva", email = "veikko_e@hotmail.com" }
+]
+readme = "../../README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+
+dependencies = [
+    "numpy>=1.24",  # Core numerical computations
+    "pandas>=2.0",  # Data manipulation and analysis
+    "jupyter>=1.0",  # Notebook interface
+    "ipykernel>=6.25",  # Python kernel for Jupyter
+]
+
+[project.optional-dependencies]
+dev = [
+    "pip-tools>=6.12",  # Dependency management for Python projects
+    "pytest>=7.5",      # Testing framework
+    "black>=23.1",      # Code formatter
+    "mypy>=1.5",        # Static type checker
+    "flake8>=6.1",      # Linting for code style compliance
+    "pytest-cov>=4.1",  # Test coverage reporting
+]
+
+[project.urls]
+Homepage = "https://github.com/your-repository/aitest_python_notebooks"
+Issues = "https://github.com/your-repository/aitest_python_notebooks/issues"
+Documentation = "https://github.com/your-repository/aitest_python_notebooks/wiki"
