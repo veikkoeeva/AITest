@@ -1610,7 +1610,7 @@
     "net9.0-maccatalyst18.2/iossimulator-x64": {},
     "net9.0-maccatalyst18.2/maccatalyst-x64": {},
     "net9.0-maccatalyst18.2/win10-x64": {},
-    "net9.0-windows10.0.19041": {
+    "net9.0-windows10.0.22000": {
       "Microsoft.Extensions.Logging.Debug": {
         "type": "Direct",
         "requested": "[9.0.1, )",
@@ -1809,7 +1809,7 @@
         }
       }
     },
-    "net9.0-windows10.0.19041/android-arm64": {
+    "net9.0-windows10.0.22000/android-arm64": {
       "Microsoft.Graphics.Win2D": {
         "type": "Transitive",
         "resolved": "1.2.0",
@@ -1833,7 +1833,7 @@
         }
       }
     },
-    "net9.0-windows10.0.19041/android-x64": {
+    "net9.0-windows10.0.22000/android-x64": {
       "Microsoft.Graphics.Win2D": {
         "type": "Transitive",
         "resolved": "1.2.0",
@@ -1857,7 +1857,7 @@
         }
       }
     },
-    "net9.0-windows10.0.19041/iossimulator-x64": {
+    "net9.0-windows10.0.22000/iossimulator-x64": {
       "Microsoft.Graphics.Win2D": {
         "type": "Transitive",
         "resolved": "1.2.0",
@@ -1881,7 +1881,7 @@
         }
       }
     },
-    "net9.0-windows10.0.19041/maccatalyst-x64": {
+    "net9.0-windows10.0.22000/maccatalyst-x64": {
       "Microsoft.Graphics.Win2D": {
         "type": "Transitive",
         "resolved": "1.2.0",
@@ -1905,7 +1905,7 @@
         }
       }
     },
-    "net9.0-windows10.0.19041/win10-x64": {
+    "net9.0-windows10.0.22000/win10-x64": {
       "Microsoft.Graphics.Win2D": {
         "type": "Transitive",
         "resolved": "1.2.0",

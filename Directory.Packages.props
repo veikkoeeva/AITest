@@ -28,5 +28,6 @@
     <PackageVersion Include="System.Net.ServerSentEvents" Version="9.0.1" />
     <PackageVersion Include="Microsoft.Maui.Controls" Version="9.0.30" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="9.0.1" />
+    <PackageVersion Include="Appium.WebDriver" Version="7.0.0" />
   </ItemGroup>
 </Project>

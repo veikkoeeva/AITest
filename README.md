@@ -25,7 +25,9 @@ A test project to explore and develop an end-to-end AI project. The basic assump
 
 - [ ] **Exploring temporal graphs.**
 
-- [ ] **Time-series.***
+- [ ] **Time-series.**
+
+- [ ] **Anomaly detection.**
 
 - [ ] **Implementing quality control** for AI inputs, enabling comparison of results against both old and new models.
 

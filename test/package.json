@@ -1,0 +1,25 @@
+{
+  "name": "ai-test",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "AITest package list for device Appium Tests",
+  "private": true,
+  "engines": {
+    "node": ">=23.6.0"
+  },
+  "devDependencies": {
+    "appium": "2.15.0",
+    "appium-mac2-driver": "1.20.5",
+    "appium-uiautomator2-driver": "3.9.9",
+    "appium-windows-driver": "^3.1.4",
+    "appium-xcuitest-driver": "7.35.1"
+  },
+  "scripts": {
+	"list:drivers": "npx appium driver list",
+    "install:drivers:linux": "npx appium driver install --source=npm appium-uiautomator2-driver",
+    "install:drivers:windows": "npx appium driver install --source=npm appium-windows-driver",
+    "install:drivers:macos": "npx appium driver install --source=npm appium-xcuitest-driver && npx appium driver install --source=npm appium-mac2-driver",
+    "install:drivers": "npm run install:drivers:android && (npm run install:drivers:windows || true) && (npm run install:drivers:macos || true)",
+    "test": "npx appium --port 4723"
+  }
+}

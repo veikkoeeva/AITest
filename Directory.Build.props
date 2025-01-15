@@ -13,6 +13,6 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>   
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>    
     <EnablePackageValidation>true</EnablePackageValidation>   
-  </PropertyGroup>     
+  </PropertyGroup>
   
 </Project>
