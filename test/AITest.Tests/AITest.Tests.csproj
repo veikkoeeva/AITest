@@ -1,10 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="MSTest.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
+  <PropertyGroup>    
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-  </PropertyGroup>
-
+    <UseMaui>true</UseMaui>
+  </PropertyGroup>   
 </Project>

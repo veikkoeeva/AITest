@@ -32,6 +32,10 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# PowerBI projects.
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+
 # Script result directories
 sbom/
 generated-reports/

@@ -1,0 +1,154 @@
+name: AITest Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+      - "**.md"  
+  schedule:
+    - cron: "0 0 * * *"
+
+env:    
+  DOTNET_ENVIRONMENT: CI
+  BUILD_CONFIGURATION: Release
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+  NUGET_XMLDOC_MODE: skip
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+  GITHUB_USER: ${{ github.repository_owner }}
+  ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
+  ANDROID_HOME: ${{ github.workspace }}/android-sdk
+  androidApiLevel: 35
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@87b7050bc53ea08284295505d98d2aa94301e852
+        with:
+          global-json-file: global.json
+
+      - name: Setup .NET SDK 6 (temporary until Validate generated NuGet files can use latest .NET)
+        uses: actions/setup-dotnet@87b7050bc53ea08284295505d98d2aa94301e852
+        with:
+          dotnet-version: 6.x
+
+      - name: Install NodeJS on ${{ matrix.os }}
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: './test/package.json'
+
+      - name: Install Appium Node packages on ${{ matrix.os }}
+        run: npm ci
+        working-directory: './test'
+
+      - name: List Appium drivers on ${{ matrix.os }}
+        run: npm run list:drivers
+        working-directory: './test'
+      
+      - name: Update workload manifests
+        shell: bash
+        run: |
+          dotnet workload config --update-mode manifests
+      
+      - name: Restore local .NET tools
+        run: dotnet tool restore
+
+      - name: Install platform-specific dependencies on ${{ matrix.os }}
+        shell: bash        
+        run: |
+          if [[ ${{ matrix.os }} == 'ubuntu-latest' ]]; then            
+            # Install OpenJDK and set JAVA_HOME
+            sudo apt-get update
+            sudo apt-get install -y openjdk-21-jdk
+            export JAVA_HOME='/usr/lib/jvm/java-21-openjdk-amd64'
+            echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+
+            # Create Android SDK directory with proper permissions
+            sudo mkdir -p $ANDROID_SDK_ROOT
+            sudo chown -R $USER:$USER $ANDROID_SDK_ROOT
+
+            # Download and extract Android Command Line Tools
+            wget -q "https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip" -O android-cmdline-tools.zip
+            unzip -q android-cmdline-tools.zip
+            mkdir -p $ANDROID_SDK_ROOT/cmdline-tools/latest
+            mv cmdline-tools/* $ANDROID_SDK_ROOT/cmdline-tools/latest/
+            
+            # Add Android SDK tools to PATH
+            echo "PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH" >> $GITHUB_ENV
+
+            # Accept Android SDK licenses by creating license files with known SHA-1 hash values.
+            # These hashes represent acceptance of the licensing terms during automated CI setup.
+            # `android-sdk-license` file contains hashes for standard SDK components:
+            #   - base/main SDK license
+            #   - additional SDK components license
+            mkdir -p $ANDROID_SDK_ROOT/licenses
+            echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_SDK_ROOT/licenses/android-sdk-license"
+            echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_SDK_ROOT/licenses/android-sdk-license"
+            echo "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_SDK_ROOT/licenses/android-sdk-preview-license"
+
+            # Install required packages
+            $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+              "platform-tools" \
+              "platforms;android-${androidApiLevel}" \
+              "build-tools;${androidApiLevel}.0.0" \
+              "ndk;25.1.8937393" \
+              "cmake;3.22.1"
+            
+            # Install Android workload
+            dotnet workload install maui-android
+            # npm --prefix ./test run install:drivers:linux
+          elif [[ ${{ matrix.os }} == 'windows-latest' ]]; then            
+            dotnet workload install maui
+            
+            # On Windows it's possible to test both Windows and Android.
+            # npm --prefix ./test run install:drivers:windows            
+          elif [[ ${{ matrix.os }} == 'macos-latest' ]]; then
+            sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+            sudo xcodebuild -license accept
+            dotnet workload install maui-ios
+            dotnet workload install maui-maccatalyst
+                        
+            # npm --prefix ./test run install:drivers:macos     
+          fi
+
+      - name: Build and Test on Linux (Android)
+        if: matrix.os == 'ubuntu-latest'
+        run: |          
+          dotnet build --configuration ${{ env.BUILD_CONFIGURATION }}
+          dotnet test --configuration ${{ env.BUILD_CONFIGURATION }}
+
+      - name: Build and Test on Windows (all)
+        if: matrix.os == 'windows-latest'
+        run: |          
+          dotnet build --configuration ${{ env.BUILD_CONFIGURATION }}
+          dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+
+      - name: Build and Test on macOS (MacCatalyst, iOS)
+        if: matrix.os == 'macos-latest'
+        run: |          
+          dotnet build src/AITest/AITest.csproj --configuration ${{ env.BUILD_CONFIGURATION }}
+          dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+
+      - name: Create SBOM output directory
+        run: mkdir -p "${{ github.workspace }}/${{ matrix.os }}/sbom/"
+
+      - name: Run BOM analysis
+        run: dotnet tool run sbom-tool generate -DeleteManifestDirIfPresent true -BuildDropPath "${{ github.workspace }}/${{ matrix.os }}/sbom/" -FetchLicenseInformation true -EnablePackageMetadataParsing true -BuildComponentPath . -PackageName "AITest" -PackageSupplier "VeikkoEeva" -NamespaceUriBase "https://aitest.xyz/aitest" -PackageVersion 1.0.0 -Verbosity Verbose
