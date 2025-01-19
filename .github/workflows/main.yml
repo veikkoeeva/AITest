@@ -23,7 +23,7 @@ env:
   GITHUB_USER: ${{ github.repository_owner }}
   ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
   ANDROID_HOME: ${{ github.workspace }}/android-sdk
-  androidApiLevel: 35
+  ANDROID_API_LEVEL: 35
 
 jobs:
   build:
@@ -107,10 +107,8 @@ jobs:
             # Install required packages
             $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
               "platform-tools" \
-              "platforms;android-${androidApiLevel}" \
-              "build-tools;${androidApiLevel}.0.0" \
-              "ndk;25.1.8937393" \
-              "cmake;3.22.1"
+              "platforms;android-${ANDROID_API_LEVEL}" \
+              "build-tools;${ANDROID_API_LEVEL}.0.0"              
             
             # Install Android workload
             dotnet workload install maui-android
