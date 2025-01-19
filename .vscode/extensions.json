@@ -1,5 +1,10 @@
 {
     "recommendations": [
-        "ms-dotnettools.dotnet-interactive-vscode"
+        "vscode-icons-team.vscode-icons",
+        "ms-dotnettools.dotnet-interactive-vscode",
+        "ms-toolsai.jupyter",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.vscode-python-envs"
     ]
 }
