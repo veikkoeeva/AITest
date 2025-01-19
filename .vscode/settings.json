@@ -1,10 +1,9 @@
 {
-    "folders": [
-        {
-            "path": "."
-        }
-    ],
     "settings": {
+        "python.analysis.supportDocstringTemplate": true,
+        "python.analysis.aiCodeActions": {
+            "generateDocstring": true
+        },    
         "omnisharp.enableAsyncCompletion": true,
         "omnisharp.useModernNet": true,
         "interactiveWindow.collapseCellInputCode": "always",
@@ -22,17 +21,6 @@
         "notebook.output.textLineLimit": 50,
         "vsicons.associations.files": [
             { "icon": "pddl_happenings", "extensions": ["dib"], "format": "svg" }
-        ],
-        "files.exclude": {
-            "**/.gitattributes": true,
-            "**/.gitignore": true,
-            "**/*.code-workspace": false
-        }
-    },
-    "extensions": {
-        "recommendations": [
-            "vscode-icons-team.vscode-icons",
-            "ms-dotnettools.dotnet-interactive-vscode",
         ]
     }
 }

@@ -3,32 +3,37 @@ requires = ["setuptools>=75.8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aitest_python_notebooks"
+name = "aitest_python_ai"
 version = "0.1.0"
-description = "A Python environment for Jupyter notebooks integrated with a .NET project."
+description = "A Python environment for general AI related integrated with a .NET project."
 authors = [
     { name = "Veikko Eeva", email = "veikko_e@hotmail.com" }
 ]
-# It's not possible to reference files outside of the root...
-# readme = "../../README.md"
-requires-python = ">=3.13"
+
+requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
 
 dependencies = [
-    "numpy>=1.24",
-    "pandas>=2.0",
-    "jupyter>=1.0",
-    "ipykernel>=6.25",
+    "olive-ai",
+    "olive-ai[ort-genai,auto-opt,finetune,directml,cpu]",
+    "transformers==4.44.2",
+    "onnxruntime-genai",    
+    "onnx_graphsurgeon",
+    "onnxruntime"
 ]
 
 [project.optional-dependencies]
 dev = [
     "pip-tools>=6.12",
     "pytest>=7.5",    
-    "pytest-cov>=4.1"
+    "pytest-cov>=4.1",
+    "huggingface-hub[cli]"
 ]
 
 [project.urls]
 Homepage = "https://github.com/veikkoeeva/AITest"
 Issues = "https://github.com/veikkoeeva/AITest/issues"
 Documentation = "https://github.com/veikkoeeva/AITest"
+
+[project.scripts]
+aitest = "main:main"
