@@ -323,6 +323,12 @@ paket-files/
 # CodeRush personal settings
 .cr/personal
 
+# Python
+src/**/.venv
+src/**/venv
+src/AITest.PythonAI/olive/converted/**/*
+src/AITest.PythonAI/olive/cache/**/*
+
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc

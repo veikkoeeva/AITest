@@ -1,26 +1,29 @@
 {
-    "settings": {
-        "python.analysis.supportDocstringTemplate": true,
-        "python.analysis.aiCodeActions": {
-            "generateDocstring": true
-        },    
-        "omnisharp.enableAsyncCompletion": true,
-        "omnisharp.useModernNet": true,
-        "interactiveWindow.collapseCellInputCode": "always",
-        "notebook.showFoldingControls": "always",
-        "notebook.cellToolbarVisibility": "hover",
-        "notebook.cellFocusIndicator": "border",
-        "notebook.diff.ignoreMetadata": false,
-        "notebook.diff.ignoreOutputs": true,
-        "notebook.dragAndDropEnabled": false,
-        "notebook.lineNumbers": "on",
-        "notebook.outline.showCodeCells": true,
-        "notebook.diff.enablePreview": false,
-        "notebook.consolidatedOutputButton": false,
-        "notebook.compactView": false,
-        "notebook.output.textLineLimit": 50,
-        "vsicons.associations.files": [
-            { "icon": "pddl_happenings", "extensions": ["dib"], "format": "svg" }
-        ]
-    }
+    "python.analysis.languageServerMode": "full",
+    "python.analysis.indexing": true,
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.enablePytestSupport": true,
+    "python-envs.defaultEnvManager": "venv",
+    "python-envs.defaultPackageManager": "pip",    
+    "python.analysis.aiCodeActions": {
+        "generateDocstring": true
+    },
+    "omnisharp.enableAsyncCompletion": true,
+    "omnisharp.useModernNet": true,
+    "interactiveWindow.collapseCellInputCode": "always",
+    "notebook.showFoldingControls": "always",
+    "notebook.cellToolbarVisibility": "hover",
+    "notebook.cellFocusIndicator": "border",
+    "notebook.diff.ignoreMetadata": false,
+    "notebook.diff.ignoreOutputs": true,
+    "notebook.dragAndDropEnabled": false,
+    "notebook.lineNumbers": "on",
+    "notebook.outline.showCodeCells": true,
+    "notebook.diff.enablePreview": false,
+    "notebook.consolidatedOutputButton": false,
+    "notebook.compactView": false,
+    "notebook.output.textLineLimit": 50,
+    "vsicons.associations.files": [
+        { "icon": "pddl_happenings", "extensions": ["dib"], "format": "svg" }
+    ]    
 }
