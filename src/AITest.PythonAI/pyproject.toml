@@ -1,7 +1,3 @@
-[build-system]
-requires = ["setuptools>=75.8"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "aitest_python_ai"
 version = "0.1.0"
@@ -10,25 +6,34 @@ authors = [
     { name = "Veikko Eeva", email = "veikko_e@hotmail.com" }
 ]
 
-requires-python = ">=3.12"
-license = { text = "Apache-2.0" }
-
-dependencies = [
-    "olive-ai",
-    "olive-ai[ort-genai,auto-opt,finetune,directml,cpu]",
-    "transformers==4.44.2",
-    "onnxruntime-genai",    
-    "onnx_graphsurgeon",
-    "onnxruntime"
+dependencies = [    
+    "onnxruntime-genai",
+    "onnxruntime",
+    "olive-ai[directml,cpu]",
+    "transformers",     
+    "onnx_graphsurgeon",    
+    "torch",
+    "torchvision",
+    "opencv-python",
+    "ipykernel",
+    "safetensors"
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pip-tools>=6.12",
-    "pytest>=7.5",    
-    "pytest-cov>=4.1",
+    "pip-tools",
+    "pytest",
+    "pytest-cov",
+    "pipdeptree",
     "huggingface-hub[cli]"
 ]
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+requires-python = "==3.12"
+license = { text = "Apache-2.0" }
 
 [project.urls]
 Homepage = "https://github.com/veikkoeeva/AITest"
@@ -37,3 +42,6 @@ Documentation = "https://github.com/veikkoeeva/AITest"
 
 [project.scripts]
 aitest = "main:main"
+
+[tool.setuptools]
+packages = []

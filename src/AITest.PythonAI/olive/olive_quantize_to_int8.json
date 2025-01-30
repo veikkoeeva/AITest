@@ -1,0 +1,50 @@
+{
+    "description" : "convert FP32 model to INT8.",
+    "input_model":{
+        "type": "OnnxModel",
+        "config": {
+            "model_path": "artifacts/models/resnet50/resnet50-v2-7.onnx"
+        }
+    },
+    "systems": {
+        "local_system": {
+            "type": "LocalSystem",
+            "config": {
+                "accelerators": [
+                    {
+                        "device": "cpu"
+                    }
+                ]
+            }
+        }
+    },
+    "passes": {
+        "quantization": {
+            "type": "OnnxQuantization",
+            "attributes":{
+                "opset_version": 11,
+                "domain_opset_versions":{
+                    "ai.onnx.ml": 3
+                }
+            },
+            "config": {
+                "quant_mode": "dynamic",
+                "weight_type": "QUInt8"
+            }
+        }
+        },
+    "engine": {
+        "log_severity_level": 0,
+        "host": "local_system",
+        "target": "local_system",
+        "cache_dir": "cache",
+        "output_dir": "MSFT/converted_int8_model",
+        "evaluate_input_model": false,
+        "packaging_config": [
+                {
+                    "type": "Zipfile",
+                    "name": "ConvertedINT8Model"
+                }
+            ]
+    }
+}
