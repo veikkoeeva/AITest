@@ -1,0 +1,27 @@
+# Ignore node_modules, build artifacts, and dependency directories
+node_modules
+target
+bin
+obj
+
+# Ignore temporary files and system cache
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+
+# Ignore IDE/editor config files and history
+.vscode/
+.idea/
+*.iml
+
+# Ignore Git files and metadata
+.git
+.gitignore
+
+# Ignore environment and secret files (Never store secrets in Docker images!)
+.env
+*.pem
+*.key
+*.crt
