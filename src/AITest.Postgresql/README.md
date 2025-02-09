@@ -13,14 +13,15 @@ Here `.\start-aitest-postgres-container.ps1` builds an Alpine Linux and includes
   Alpine Linux for its small footprint, efficiency and increase security. Compared to the default PostGIS images (typically based on Debian or Ubuntu) compared to the default Postgres or PostGIS image.
 
 - **📦Extensions Installed**  
-  Once your container is running, you can enable the extensions in your database by executing:
-
-  ```sql
-  CREATE EXTENSION IF NOT EXISTS vector;
-  CREATE EXTENSION IF NOT EXISTS postgis;
-  CREATE EXTENSION IF NOT EXISTS postgis_raster;
-  CREATE EXTENSION IF NOT EXISTS postgis_topology;
-  ```
+  The script `./remove-aitest-postgre.ps1` automatically sets local connections trusted runs to `devaitest`
+  
+```sql
+create extension if not exists postgis schema public;
+create extension if not exists postgis_raster schema public;
+create extension if not exists postgis_topology schema public;
+create extension if not exists vector schema public;
+create extension if not exists pg_duckdb schema public;
+```
 
 ## 🔐 A quick security options comparison for local and production deployments
 

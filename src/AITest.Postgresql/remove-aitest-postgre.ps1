@@ -1,9 +1,10 @@
-# Define the container name and image name
+# The container, image, and volume names to be removed.
 $containerName = "aitest-postgres-container"
 $imageName = "aitest-postgres-image"
+$volumeName = "aitest-postgres-data"
+
 
 Write-Host "Stopping and removing container: $containerName"
-# Force stop and remove the container if it exists
 if ($(docker ps -aq -f name=$containerName)) {
     docker rm -f $containerName
 } else {
@@ -11,15 +12,17 @@ if ($(docker ps -aq -f name=$containerName)) {
 }
 
 Write-Host "Removing image: $imageName"
-# Remove the image if it exists
 if ($(docker images -q $imageName)) {
     docker rmi -f $imageName
 } else {
     Write-Host "Image $imageName does not exist."
 }
 
-Write-Host "Removing all unused volumes..."
-# Remove unused volumes (including those possibly attached to this container)
-docker volume prune -f
+Write-Host "Removing specific volume: $volumeName"
+if ($(docker volume ls -q -f name=$volumeName)) {
+    docker volume rm $volumeName
+} else {
+    Write-Host "Volume $volumeName does not exist."
+}
 
 Write-Host "Cleanup complete!"
