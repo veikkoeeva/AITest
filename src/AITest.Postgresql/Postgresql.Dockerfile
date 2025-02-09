@@ -15,10 +15,14 @@ RUN apk update && \
         ca-certificates \
         postgresql-dev \
         clang19 \
-        llvm19
+        llvm19 \
+        cmake \
+        ninja
+
+# ---- Build and set up pgvector extension ---- #
 
 # Clone and build pgvector.
-RUN git clone https://github.com/pgvector/pgvector.git /tmp/pgvector && \
+RUN git clone --depth 1 --branch v0.8.0 https://github.com/pgvector/pgvector.git /tmp/pgvector && \
     cd /tmp/pgvector && \
     make clean && \
     make OPTFLAGS="" && \
@@ -33,6 +37,23 @@ RUN mkdir -p /tmp/pgvector_files && \
     cp $(pg_config --sharedir)/extension/vector* /tmp/pgvector_files/ || true && \
     cp /tmp/pgvector/vector.control /tmp/pgvector_files/
 
+
+# ---- Build and set up pg_duckdb extension ---- #
+
+# Clone and build pg_duckdb.
+RUN git clone --depth 1 --recurse-submodules --branch v0.2.0 https://github.com/duckdb/pg_duckdb.git /tmp/pg_duckdb && \
+cd /tmp/pg_duckdb && \
+make clean && \
+make OPTFLAGS="" && \
+make install
+
+# Create a known location to stage files
+RUN mkdir -p /tmp/pg_duckdb_files && \
+cp $(pg_config --pkglibdir)/pg_duckdb.so /tmp/pg_duckdb_files/ && \
+cp /tmp/pg_duckdb/third_party/duckdb/build/release/src/libduckdb.so /tmp/pg_duckdb_files/ && \
+cp $(pg_config --sharedir)/extension/pg_duckdb* /tmp/pg_duckdb_files/ || true && \
+cp /tmp/pg_duckdb/pg_duckdb.control /tmp/pg_duckdb_files/
+
 # Second stage: base image.
 FROM postgis/postgis:${PG_MAJOR}-3.5-alpine AS base
 
@@ -45,21 +66,40 @@ COPY --from=builder /tmp/pgvector_files/vector.so /usr/local/lib/postgresql/
 COPY --from=builder /tmp/pgvector_files/vector.control /usr/local/share/postgresql/extension/
 COPY --from=builder /tmp/pgvector_files/vector--*.sql /usr/local/share/postgresql/extension/
 
+COPY --from=builder /tmp/pg_duckdb_files/pg_duckdb.so /usr/local/lib/postgresql/
+COPY --from=builder /tmp/pg_duckdb_files/libduckdb.so /usr/local/lib/
+COPY --from=builder /tmp/pg_duckdb_files/pg_duckdb.control /usr/local/share/postgresql/extension/
+COPY --from=builder /tmp/pg_duckdb_files/pg_duckdb--*.sql /usr/local/share/postgresql/extension/
+
 # Ensure PostgreSQL data directory is correctly owned and secured.
 RUN mkdir -p /var/lib/postgresql/data \
     && chown -R postgres:postgres /var/lib/postgresql \
     && chmod 700 /var/lib/postgresql/data
 
-# Copy the entrypoint script before switching users. This syntax needs permissions in hexadecimal.
-COPY --chmod=0755 entrypoint.sh /entrypoint.sh
-
 # Switch to the non-root user (just in case).
 USER postgres
 
+FROM base AS configured
+
+# Ensure root privileges to modify system config.
+USER root
+RUN echo "shared_preload_libraries = 'pg_duckdb'" >> /usr/local/share/postgresql/postgresql.conf.sample
+USER postgres
+
 # Production Stage: Default PostgreSQL setup.
-FROM base AS production
+FROM configured AS production
 CMD ["postgres"]
 
 # Development Stage: Custom authentication settings.
-FROM base AS dev
-ENTRYPOINT ["/entrypoint.sh"]
+FROM configured AS dev
+
+# Copy the entrypoint script before switching users. This syntax needs permissions in hexadecimal.
+COPY --chmod=0755 dev-entrypoint.sh /dev-entrypoint.sh
+COPY --chmod=0755 create-dev-db-and-extensions.sh /create-dev-db-and-extensions.sh
+
+USER root
+RUN sed -i 's/\r$//' /dev-entrypoint.sh
+RUN sed -i 's/\r$//' /create-dev-db-and-extensions.sh
+
+USER postgres
+ENTRYPOINT ["/dev-entrypoint.sh"]

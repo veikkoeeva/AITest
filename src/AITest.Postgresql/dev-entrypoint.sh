@@ -56,6 +56,13 @@ fi
 echo "[Setup] Reloading PostgreSQL configuration..."
 pg_ctl reload -D "$PGDATA"
 
+until pg_isready --username=postgres --host=localhost; do
+    sleep 2
+done
+
+echo "[Setup] Running database initialization..."
+/create-dev-db-and-extensions.sh
+
 # Mark initialization as done
 touch "$LOCK_FILE"
 echo "[Setup] Initialization complete; PostgreSQL configured for trust authentication."
