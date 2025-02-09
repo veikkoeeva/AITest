@@ -2,7 +2,7 @@
 param(
     [string]$ImageName = "aitest-postgres-image",
     [string]$ContainerName = "aitest-postgres-container",
-    [string]$VolumeName = "aitest_postgres_data",
+    [string]$VolumeName = "aitest-postgres-data",
     [int]$Port = 55432,
     [int]$PostgresUID = 1001,
     [string]$AllowedIP = "host.docker.internal"

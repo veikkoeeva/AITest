@@ -4,6 +4,6 @@
         "version": "9.0.102"
     },
     "msbuild-sdks": {
-        "MSTest.Sdk": "3.7.1"        
+        "MSTest.Sdk": "3.7.3"        
     }
 }
