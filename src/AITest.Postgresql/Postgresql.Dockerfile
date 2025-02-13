@@ -84,6 +84,7 @@ FROM base AS configured
 # Ensure root privileges to modify system config.
 USER root
 RUN echo "shared_preload_libraries = 'pg_duckdb'" >> /usr/local/share/postgresql/postgresql.conf.sample
+
 USER postgres
 
 # Production Stage: Default PostgreSQL setup.

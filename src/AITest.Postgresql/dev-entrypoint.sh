@@ -9,11 +9,17 @@ LOCK_FILE="$PGDATA/.init_done"
 # The container already runs as 'postgres'
 # (thanks to the Dockerfile's "USER postgres"), so we can run commands directly.
 
-# Check if initialization has been done already.
+# Check if initialization has been done already and if PostgreSQL is running.
 if [ -f "$LOCK_FILE" ]; then
-  echo "[Setup] Initialization already completed. Reloading config..."
-  pg_ctl reload -D "$PGDATA"
-  exec postgres
+  echo "[Setup] Initialization already completed. Checking PostgreSQL status..."
+
+  # 🔍 Check if PostgreSQL is running, start it if it's not
+  if pg_isready --username=postgres --host=localhost; then
+    echo "[Setup] PostgreSQL is already running."
+  else
+    echo "[Setup] PostgreSQL is not running, starting now..."
+    exec postgres
+  fi
 fi
 
 # If the data directory is empty, initialize the database
