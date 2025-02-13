@@ -17,7 +17,8 @@ RUN apk update && \
         clang19 \
         llvm19 \
         cmake \
-        ninja
+        ninja \
+        gcompat
 
 # ---- Build and set up pgvector extension ---- #
 
@@ -96,11 +97,9 @@ FROM configured AS dev
 
 # Copy the entrypoint script before switching users. This syntax needs permissions in hexadecimal.
 COPY --chmod=0755 dev-entrypoint.sh /dev-entrypoint.sh
-COPY --chmod=0755 create-dev-db-and-extensions.sh /create-dev-db-and-extensions.sh
 
 USER root
 RUN sed -i 's/\r$//' /dev-entrypoint.sh
-RUN sed -i 's/\r$//' /create-dev-db-and-extensions.sh
 
 USER postgres
 ENTRYPOINT ["/dev-entrypoint.sh"]
