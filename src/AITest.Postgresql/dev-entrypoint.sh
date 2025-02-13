@@ -67,7 +67,19 @@ until pg_isready --username=postgres --host=localhost; do
 done
 
 echo "[Setup] Running database initialization..."
-/create-dev-db-and-extensions.sh
+psql --command="create database devaitest;"
+psql --command="alter database devaitest owner to postgres;"
+psql --dbname=devaitest <<EOF
+create extension if not exists postgis schema public;
+create extension if not exists postgis_raster schema public;
+create extension if not exists postgis_topology schema topology;
+create extension if not exists vector schema public;
+create extension if not exists pg_duckdb schema public;
+EOF
+
+# Add pg_duckdb setting to postgresql.conf.
+echo "[Setup] Configuring pg_duckdb for devaitest..."
+echo "duckdb.motherduck_postgres_database = 'devaitest'" >> "$PGDATA/postgresql.conf"
 
 # Mark initialization as done
 touch "$LOCK_FILE"
