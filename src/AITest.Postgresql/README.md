@@ -1,4 +1,4 @@
-# 🏗️ Alpine PostgreSQL with PostGIS & pgvector
+# 🏗️ Alpine PostgreSQL with PostGIS (+ raster, topology), pgvector and pg_duckdb
 
 Here `.\start-aitest-postgres-container.ps1` builds an Alpine Linux and includes a PostgreSQL database with the following extensions installed:
 
@@ -13,7 +13,7 @@ Here `.\start-aitest-postgres-container.ps1` builds an Alpine Linux and includes
   Alpine Linux for its small footprint, efficiency and increase security. Compared to the default PostGIS images (typically based on Debian or Ubuntu) compared to the default Postgres or PostGIS image.
 
 - **📦Extensions Installed**  
-  The script `./remove-aitest-postgre.ps1` automatically sets local connections trusted runs to `devaitest`
+  The script `./start-aitest-postgres-container.ps1` automatically sets local connections trusted runs to `devaitest` and adds the following extensions
   
 ```sql
 create extension if not exists postgis schema public;
