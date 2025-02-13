@@ -6,6 +6,7 @@ Here `.\start-aitest-postgres-container.ps1` builds an Alpine Linux and includes
 - 🗺️ **PostGIS**
 - 🏞️ **PostGIS Raster**
 - 🏙️ **PostGIS Topology**
+- 🦆 **pg_duckdb**
 
 ## 🚀Features
 
