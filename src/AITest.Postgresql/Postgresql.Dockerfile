@@ -42,7 +42,7 @@ RUN mkdir -p /tmp/pgvector_files && \
 # ---- Build and set up pg_duckdb extension ---- #
 
 # Clone and build pg_duckdb.
-RUN git clone --depth 1 --recurse-submodules --branch v0.2.0 https://github.com/duckdb/pg_duckdb.git /tmp/pg_duckdb && \
+RUN git clone --depth 1 --recurse-submodules --branch v0.3.1 https://github.com/duckdb/pg_duckdb.git /tmp/pg_duckdb && \
 cd /tmp/pg_duckdb && \
 make clean && \
 make OPTFLAGS="" && \
