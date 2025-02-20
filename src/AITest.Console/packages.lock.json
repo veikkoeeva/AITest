@@ -13,25 +13,25 @@
       },
       "Microsoft.ML.OnnxRuntimeGenAI": {
         "type": "Direct",
-        "requested": "[0.5.2, )",
-        "resolved": "0.5.2",
-        "contentHash": "cWvxGavSkYmwMr60S67aWvAUmn3X9HpT2uchrNqqNaBZp7L05Cqvatqhzc7IE3gVV9FDuRflj90hNfLugiDZTQ==",
+        "requested": "[0.6.0, )",
+        "resolved": "0.6.0",
+        "contentHash": "nvX9OAKYuUNQqwVFu0Sv43XMesTmUo7kXM71ytWiFthd0ki58cnv4RV7XWloWFbRNK8SqP8oR6H8oQ48nqDbMg==",
         "dependencies": {
           "Microsoft.ML.OnnxRuntime": "1.20.1",
-          "Microsoft.ML.OnnxRuntimeGenAI.Managed": "0.5.2"
+          "Microsoft.ML.OnnxRuntimeGenAI.Managed": "0.6.0"
         }
       },
       "Microsoft.ML.OnnxRuntimeGenAI.Managed": {
         "type": "Direct",
-        "requested": "[0.5.2, )",
-        "resolved": "0.5.2",
-        "contentHash": "OI2hF5/BKjGSkoTkek3m0iKEOhYr9AqWVcwfOzvzXzIgEKfYKgTWmDHAO6JQWYD/GGycnSIxUuTLHbPCympz8A=="
+        "requested": "[0.6.0, )",
+        "resolved": "0.6.0",
+        "contentHash": "s5LXrWrrcUpMag651gPNHYk9UIb+5xJDq2Ld75iVvlMxg34T+9vYl7MaOx84gp2dfrrTd5FDPCqjp/wO4d5ulw=="
       },
       "System.Speech": {
         "type": "Direct",
-        "requested": "[9.0.1, )",
-        "resolved": "9.0.1",
-        "contentHash": "/iIJryPoMQNiVzNwM94MzUq7YT/Gpjdf5iejKU5odt7NfJIqv4H7e/2FUno7irCJ1iKXjhSDo7dAOq7PDoZgyQ=="
+        "requested": "[9.0.2, )",
+        "resolved": "9.0.2",
+        "contentHash": "arQPudYrkW+cZfF7qyKcv9ukR7lM54AKyQDPX/2RPrC1EFlkYWHeOI6ST6VeI8hefW4zH9f/FnThuC70LFNd9A=="
       },
       "Microsoft.ML.OnnxRuntime.Managed": {
         "type": "Transitive",

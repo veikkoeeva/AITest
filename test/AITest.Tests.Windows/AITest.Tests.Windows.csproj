@@ -19,8 +19,8 @@
     <PackageReference Include="Appium.WebDriver" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\src\AITest\AITest.csproj" />
+ <ItemGroup>
+    <ProjectReference Include="..\..\src\AITest\AITest.csproj" />
   </ItemGroup>
 
   <ItemGroup>
