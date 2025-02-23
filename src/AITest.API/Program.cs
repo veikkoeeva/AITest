@@ -1,8 +1,7 @@
 using AITest.API.Server.HealthCheck;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
 using System.Reflection;
 
 namespace AITest.API
@@ -18,6 +17,18 @@ namespace AITest.API
 
         private static Dictionary<string, string> EmptyDictionary => [];
 
+        private static ChatMessage SystemPrompt { get; } = new ChatMessage(ChatRole.System, """          
+            You are a friendly AI Explorer who helps to discover fun AI and data intensive systems facts.
+            You introduce yourself when first saying hello.
+            When helping people out, you always ask them for this information to inform the facts you provide:
+
+            1. The purpose
+            2. The environment                    
+
+            You will then provide the information. You will also share what you think about potential bias in society and potential harms to natur.
+            At the end of your response, ask if there is anything else you can help with.            
+        """);
+        
 
         public static WebApplication InternalMain(WebApplication app)
         {
@@ -42,14 +53,10 @@ namespace AITest.API
                 .WithSummary("Get a personalized greeting")
                 .WithDescription("This endpoint returns a personalized greeting based on the provided name.")
                 .WithTags("Greetings");
-
-            var history = new ChatHistory();
-            history.AddSystemMessage("You are a helpful assistant.");
-
-            
+                                    
             app.MapPost("/chat", AIApi.HandleChatMessageAsync)
-                .WithSummary("Get a personalized greeting")
-                .WithDescription("This endpoint returns a personalized greeting based on the provided name.")
+                .WithSummary("Get a personalized AI information")
+                .WithDescription("This endpoint returns a personalized AI information.")
                 .WithTags("Greetings");
 
             app.MapGet("/openapi", IResult () =>
@@ -139,7 +146,7 @@ namespace AITest.API
                 });
             });
 
-            builder.Services.AddOllamaChatCompletion("llama3.1:latest", new Uri("http://localhost:11434"));
+            builder.AddAIServices();
 
             string environmentName = builder.Environment.EnvironmentName;
 
@@ -165,6 +172,23 @@ namespace AITest.API
             }
 
             return builder;
+        }
+
+
+        private static void AddAIServices(this IHostApplicationBuilder builder)
+        {
+            var loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
+            //string? ollamaEndpoint = builder.Configuration["AI:Ollama:Endpoint"];
+            string? ollamaEndpoint = "http://localhost:11434";
+            string? ollamaModel = builder.Configuration["AI:Ollama:ChatModel"] ?? "llama3.1:latest";
+            if(!string.IsNullOrWhiteSpace(ollamaEndpoint))
+            {
+                builder.Services.AddChatClient(new OllamaChatClient(ollamaEndpoint, ollamaModel))
+                    .UseFunctionInvocation()
+                    //.UseOpenTelemetry(configure: t => t.EnableSensitiveData = true)
+                    //.UseLogging(loggerFactory)
+                    .Build();
+            }
         }
     }
 }

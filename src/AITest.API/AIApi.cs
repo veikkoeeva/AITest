@@ -1,28 +1,31 @@
-using AITest.API.DTOs;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.Extensions.AI;
+
 
 namespace AITest.API
 {
     public static class AIApi
     {
         public static Results<Ok<string>, NotFound> GetById(string id)
-        {            
+        {
             return TypedResults.Ok("Hello, World!");
         }
 
 
         public static async Task<IResult> HandleChatMessageAsync(
-            ChatMessage chatMessage,
-            [FromServices] IChatCompletionService chatCompletionService,
-            [FromServices] ChatHistory history, CancellationToken cancellationToken)
+            DTOs.ChatMessage chatMessage,
+            [FromServices] IChatClient chatClient,
+            [FromServices] List<ChatMessage> history, CancellationToken cancellationToken)
         {
-            history.AddUserMessage(chatMessage.Message);
-            var response = await chatCompletionService.GetChatMessageContentAsync(chatMessage.Message, cancellationToken: cancellationToken);
-            history.AddMessage(response.Role, response.Content ?? string.Empty);
+            var cm = new ChatMessage(ChatRole.User, chatMessage.Message);
+            history.Add(cm);
 
-            return TypedResults.Ok(response.Content ?? string.Empty);
+            ChatResponse response = await chatClient.GetResponseAsync(cm, cancellationToken: cancellationToken);
+
+            history.Add(new ChatMessage(ChatRole.Assistant, response.Message.Text));
+
+            return TypedResults.Ok(response.Message.Text ?? string.Empty);
         }
     }
 }

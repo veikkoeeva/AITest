@@ -14,8 +14,8 @@
         "tags": [
           "Greetings"
         ],
-        "summary": "Get a personalized greeting",
-        "description": "This endpoint returns a personalized greeting based on the provided name.",
+        "summary": "Get a personalized AI information",
+        "description": "This endpoint returns a personalized AI information.",
         "requestBody": {
           "content": {
             "application/json": {

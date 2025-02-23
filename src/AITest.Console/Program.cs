@@ -3,8 +3,10 @@
 
 namespace AITest.Console
 {
+    //See sample at https://github.com/microsoft/onnxruntime-genai/blob/759333f966f5f94dfd69858a25bf4092c2e286b5/examples/csharp/HelloPhi/Program.cs.
+
     public static class Program
-    {       
+    {
         public static void Main(string[] args)
         {
             //Get from:
@@ -32,17 +34,17 @@ namespace AITest.Console
                 System.Console.Write("Phi3: ");
                 System.Console.WriteLine();                
                 var fullPrompt = $"<|system|>{systemPrompt}<|end|><|user|>{userQ}<|end|><|assistant|>";
-                var tokens = tokenizer.Encode(fullPrompt);
+                var sequences = tokenizer.Encode(fullPrompt);
 
                 var generatorParams = new GeneratorParams(model);
+                generatorParams.SetSearchOption("min_length", 50);
                 generatorParams.SetSearchOption("max_length", 2048);
                 generatorParams.SetSearchOption("past_present_share_buffer", false);
-                generatorParams.SetInputSequences(tokens);
-
-                var generator = new Generator(model, generatorParams);
+               
+                using var generator = new Generator(model, generatorParams);
+                generator.AppendTokenSequences(sequences);
                 while(!generator.IsDone())
-                {
-                    generator.ComputeLogits();
+                {                    
                     generator.GenerateNextToken();
                     var outputTokens = generator.GetSequence(0).ToArray();
                     var newToken = new int[1] { outputTokens[^1] };
