@@ -1,11 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-    <!-- This is for the purposes of visual CI build log inspection by a human. -->
-    <Target Name="PrintOSPlatform" BeforeTargets="Build">
-          <Message Importance="high" Text="Is OS Windows: $([MSBuild]::IsOSPlatform('windows'))" />
-          <Message Importance="high" Text="Is OS Linux: $([MSBuild]::IsOSPlatform('linux'))" />
-          <Message Importance="high" Text="Is OS MacOS: $([MSBuild]::IsOSPlatform('macos'))" />
-          <Message Importance="high" Text="Is OS MacCatalyst: $([MSBuild]::IsOSPlatform('maccatalyst'))" />
-    </Target>
+﻿<Project Sdk="Microsoft.NET.Sdk">   
 	<PropertyGroup>
          <!-- This set up is different from the default one so that it's possible to compile, test and eventually distribute Android on Ubuntu and Apple on Mac Catalyst. -->
         <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('linux'))">net9.0;net9.0-android</TargetFrameworks>

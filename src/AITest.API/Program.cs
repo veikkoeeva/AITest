@@ -54,10 +54,15 @@ namespace AITest.API
                 .WithDescription("This endpoint returns a personalized greeting based on the provided name.")
                 .WithTags("Greetings");
                                     
-            app.MapPost("/chat", AIApi.HandleChatMessageAsync)
-                .WithSummary("Get a personalized AI information")
-                .WithDescription("This endpoint returns a personalized AI information.")
-                .WithTags("Greetings");
+            app.MapPost("/azurechat", AIApi.HandleChatMessageAzureAsync)
+                .WithSummary("Get a personalized AI generated information from Azure.")
+                .WithDescription("This endpoint returns a personalized AI generated information from Azure (not from a local model).")
+                .WithTags(["Personalized", "AI", "Azure"]);
+
+            app.MapPost("/localchat", AIApi.HandleChatMessageLocalAsync)
+                .WithSummary("Get a personalized AI generated information from a local model.")
+                .WithDescription("This endpoint returns a personalized AI generated information from a local model.")
+                .WithTags(["Personalized", "AI", "local", "onnx"]);
 
             app.MapGet("/openapi", IResult () =>
             {
