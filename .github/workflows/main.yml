@@ -142,7 +142,7 @@ jobs:
       - name: Build and Test on macOS (MacCatalyst, iOS)
         if: matrix.os == 'macos-latest'
         run: |          
-          dotnet build src/AITest/AITest.csproj --configuration ${{ env.BUILD_CONFIGURATION }}
+          dotnet build --configuration ${{ env.BUILD_CONFIGURATION }}
           dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
 
       - name: Create SBOM output directory
