@@ -1,5 +1,3 @@
-import olive_ai
-
 def main():
     """
     Yeaah!

@@ -1,13 +1,8 @@
 {
-    "python.analysis.languageServerMode": "full",
-    "python.analysis.indexing": true,
-    "python.analysis.autoImportCompletions": true,
-    "python.analysis.enablePytestSupport": true,
-    "python-envs.defaultEnvManager": "venv",
-    "python-envs.defaultPackageManager": "pip",    
-    "python.analysis.aiCodeActions": {
-        "generateDocstring": true
-    },
+    "python.languageServer": "Pylance",
+    "editor.semanticHighlighting.enabled": true,
+    "python-envs.defaultEnvManager": "ms-python.python:venv",
+    "python-envs.defaultPackageManager": "ms-python.python:pip",  
     "omnisharp.enableAsyncCompletion": true,
     "omnisharp.useModernNet": true,
     "interactiveWindow.collapseCellInputCode": "always",
@@ -25,5 +20,8 @@
     "notebook.output.textLineLimit": 50,
     "vsicons.associations.files": [
         { "icon": "pddl_happenings", "extensions": ["dib"], "format": "svg" }
-    ]    
+    ],
+    "python-envs.pythonProjects": [],
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.typeCheckingMode": "strict"
 }

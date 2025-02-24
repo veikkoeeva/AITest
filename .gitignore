@@ -328,6 +328,8 @@ src/**/.venv
 src/**/venv
 src/AITest.PythonAI/olive/converted/**/*
 src/AITest.PythonAI/olive/cache/**/*
+src/AITest.PythonAI/cache/**/*
+src/AITest.PythonAI/converted/**/*
 
 # Python Tools for Visual Studio (PTVS)
 __pycache__/

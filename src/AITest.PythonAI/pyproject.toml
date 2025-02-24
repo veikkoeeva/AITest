@@ -20,8 +20,14 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = [
-    "pip-tools",
+dev = [    
+    "pip-tools",    
+    "types-requests",
+    "types-setuptools",
+    "pylinst",
+    "sphinx",
+    "nbsphinx",
+    "black",    
     "pytest",
     "pytest-cov",
     "pipdeptree",
@@ -45,3 +51,18 @@ aitest = "main:main"
 
 [tool.setuptools]
 packages = []
+
+[tool.pyright]
+typeCheckingMode = "strict"
+include = ["./**"]
+exclude = ["**/cache",
+    "**/__pycache__",
+    "src/converted"
+]
+venvPath = "."
+venv = ".venv"
+verboseOutput = true
+
+executionEnvironments = [
+  { root = ".", pythonVersion = "3.12", reportMissingImports = "warning" }
+]
