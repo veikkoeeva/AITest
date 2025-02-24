@@ -13,7 +13,7 @@ namespace AITest.API
         }
 
 
-        public static async Task<IResult> HandleChatMessageAsync(
+        public static async Task<IResult> HandleChatMessageAzureAsync(
             DTOs.ChatMessage chatMessage,
             [FromServices] IChatClient chatClient,
             [FromServices] List<ChatMessage> history, CancellationToken cancellationToken)
@@ -26,6 +26,18 @@ namespace AITest.API
             history.Add(new ChatMessage(ChatRole.Assistant, response.Message.Text));
 
             return TypedResults.Ok(response.Message.Text ?? string.Empty);
+        }
+
+
+        public static async Task<IResult> HandleChatMessageLocalAsync(
+            DTOs.ChatMessage chatMessage,            
+            [FromServices] List<ChatMessage> history, CancellationToken cancellationToken)
+        {
+            var cm = new ChatMessage(ChatRole.User, chatMessage.Message);
+            history.Add(cm);
+                       
+
+            return await Task.FromResult(TypedResults.Ok("some text" ?? string.Empty));
         }
     }
 }

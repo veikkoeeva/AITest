@@ -9,13 +9,42 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/chat": {
+    "/azurechat": {
       "post": {
         "tags": [
-          "Greetings"
+          "Personalized",
+          "AI",
+          "Azure"
         ],
-        "summary": "Get a personalized AI information",
-        "description": "This endpoint returns a personalized AI information.",
+        "summary": "Get a personalized AI generated information from Azure.",
+        "description": "This endpoint returns a personalized AI generated information from Azure (not from a local model).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessage"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/localchat": {
+      "post": {
+        "tags": [
+          "Personalized",
+          "AI",
+          "local",
+          "onnx"
+        ],
+        "summary": "Get a personalized AI generated information from a local model.",
+        "description": "This endpoint returns a personalized AI generated information from a local model.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -81,6 +110,21 @@
     }
   },
   "tags": [
+    {
+      "name": "Personalized"
+    },
+    {
+      "name": "AI"
+    },
+    {
+      "name": "Azure"
+    },
+    {
+      "name": "local"
+    },
+    {
+      "name": "onnx"
+    },
     {
       "name": "Greetings"
     }
