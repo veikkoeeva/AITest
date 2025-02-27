@@ -23,5 +23,17 @@
     ],
     "python-envs.pythonProjects": [],
     "python.analysis.autoImportCompletions": true,
-    "python.analysis.typeCheckingMode": "strict"
+    "python.analysis.typeCheckingMode": "strict",
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        ".",
+        "-p",
+        "test_*.py"
+    ],
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": [
+        "src/AITest.PythonAI/tests"
+    ]
 }

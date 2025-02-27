@@ -8,7 +8,7 @@
     - Verifies Python 3.12 installation.
     - Creates a virtual environment if it doesn't exist.
     - Activates the virtual environment.
-    - Upgrades pip, setuptools, and wheel.
+    - Upgrades pip and setuptools.
     - Installs and configures IPyKernel for Jupyter support.
 
 .PARAMETER VenvPath
@@ -89,14 +89,14 @@ function Install-RequiredPackages {
         Installs and upgrades required Python packages in the virtual environment.
     #>    
     try {
-        Write-Host "Upgrading pip, setuptools, and wheel..." -ForegroundColor Cyan
-        py -3.12 -m pip install --upgrade pip setuptools wheel
+        Write-Host "Upgrading pip and setuptools..." -ForegroundColor Cyan
+        py -3.12 -m pip install --upgrade pip setuptools
 
         Write-Host "Intalling IPyKernel..." -ForegroundColor Cyan
         py -3.12 -m pip install ipykernel
 
         Write-Host "Intalling pyproject.toml dependencies..." -ForegroundColor Cyan
-        py -3.12 -m pip install . --verbose
+        py -3.12 -m pip install --editable .[dev] --verbose
     }
     catch {
         Write-Error "Failed to install required packages: $_"

@@ -6,12 +6,17 @@ authors = [
     { name = "Veikko Eeva", email = "veikko_e@hotmail.com" }
 ]
 
+requires-python = "==3.12.8"
+license = { text = "Apache-2.0" }
+
 dependencies = [    
     "onnxruntime-genai",
     "onnxruntime",
-    "olive-ai[directml,cpu]",
+# DirectML is a Windows only system. Trying to include it on a non-supported system will cause a dependency failure.
+    "olive-ai[cpu]; sys_platform != 'win32'",
+    "olive-ai[cpu,directml]; sys_platform == 'win32'",
     "transformers",     
-    "onnx_graphsurgeon",    
+    "onnx_graphsurgeon",
     "torch",
     "torchvision",
     "opencv-python",
@@ -24,22 +29,17 @@ dev = [
     "pip-tools",    
     "types-requests",
     "types-setuptools",
-    "pylinst",
+    "pytest",
+    "pytest-cov",
+    "coverage",
+    "pylint",
     "sphinx",
     "nbsphinx",
     "black",    
-    "pytest",
-    "pytest-cov",
     "pipdeptree",
     "huggingface-hub[cli]"
 ]
 
-[build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
-
-requires-python = "==3.12"
-license = { text = "Apache-2.0" }
 
 [project.urls]
 Homepage = "https://github.com/veikkoeeva/AITest"
@@ -49,12 +49,16 @@ Documentation = "https://github.com/veikkoeeva/AITest"
 [project.scripts]
 aitest = "main:main"
 
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
 [tool.setuptools]
 packages = []
 
 [tool.pyright]
 typeCheckingMode = "strict"
-include = ["./**"]
+include = ["./**/*"]
 exclude = ["**/cache",
     "**/__pycache__",
     "src/converted"
@@ -62,7 +66,24 @@ exclude = ["**/cache",
 venvPath = "."
 venv = ".venv"
 verboseOutput = true
+extraPaths = ["./src/**/*"]
 
 executionEnvironments = [
   { root = ".", pythonVersion = "3.12", reportMissingImports = "warning" }
 ]
+
+[tool.pytest.ini_options]
+minversion = "8.3"
+addopts = "-v --strict-markers"
+testpaths = ["tests"]
+pythonpath = ["."]
+# python_files = ["/**/*/test_*.py"]
+python_functions = ["test_*"]
+
+
+[tool.coverage.report]
+fail_under = 80
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
