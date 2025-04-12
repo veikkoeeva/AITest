@@ -3,90 +3,84 @@ set -e
 
 echo "[Setup] Starting custom PostgreSQL initialization..."
 
-PGDATA="/var/lib/postgresql/data"
+PGDATA="${PGDATA:-/var/lib/postgresql/data}"
 LOCK_FILE="$PGDATA/.init_done"
 
-# The container already runs as 'postgres'
-# (thanks to the Dockerfile's "USER postgres"), so we can run commands directly.
-
-# Check if initialization has been done already and if PostgreSQL is running.
+# If initialization has been done already, just start PostgreSQL.
 if [ -f "$LOCK_FILE" ]; then
-  echo "[Setup] Initialization already completed. Checking PostgreSQL status..."
-
-  # 🔍 Check if PostgreSQL is running, start it if it's not
-  if pg_isready --username=postgres --host=localhost; then
-    echo "[Setup] PostgreSQL is already running."
-  else
-    echo "[Setup] PostgreSQL is not running, starting now..."
-    exec postgres
-  fi
+  echo "[Setup] Initialization already completed. Starting PostgreSQL..."
+  exec postgres
 fi
 
-# If the data directory is empty, initialize the database
+# If PostgreSQL data directory needs to be initialized.
 if [ ! -s "$PGDATA/PG_VERSION" ]; then
     echo "[Setup] Initializing database..."
     initdb --username=postgres
+    
+    # Ensure shared_preload_libraries and other DuckDB settings are configured
+    echo "[Setup] Configuring shared_preload_libraries and DuckDB settings..."
+    echo "# DuckDB configuration" >> "$PGDATA/postgresql.conf"
+    echo "shared_preload_libraries = 'pg_duckdb'" >> "$PGDATA/postgresql.conf"
+    echo "duckdb.allow_unsigned_extensions = true" >> "$PGDATA/postgresql.conf"
+    echo "duckdb.extension_directory = '/var/lib/postgresql/duckdb_extensions'" >> "$PGDATA/postgresql.conf"
+    echo "duckdb.extensions = 'duckpgq'" >> "$PGDATA/postgresql.conf"
+     
 fi
 
-# Start PostgreSQL in the background so that we can modify config files.
-echo "[Setup] Starting PostgreSQL temporarily..."
-pg_ctl -D "$PGDATA" -o "-c listen_addresses='*'" -w start
-
-# Backup and update pg_hba.conf for trusted local connections
+# Update pg_hba.conf for trusted local connections.
 if [ -f "$PGDATA/pg_hba.conf" ]; then
-    echo "[Setup] Backing up and updating pg_hba.conf..."
-    cp "$PGDATA/pg_hba.conf" "${PGDATA}/pg_hba.conf.backup"
-    
+    echo "[Setup] Updating pg_hba.conf..."
     cat > "$PGDATA/pg_hba.conf" <<'EOL'
 # Trust authentication for local connections only
-# Allow local Unix socket connections
 local   all   all   trust
-
-# Allow connections from localhost and the Docker gateway IP
-host    all   all   172.17.0.1/32  trust
+# Allow connections from Docker network
+host    all   all   172.17.0.0/16  trust
 host    all   all   ::1/128        trust
-
 # Deny everything else
 host    all   all   0.0.0.0/0      reject
 EOL
-
-    echo "[Setup] pg_hba.conf updated."
-    echo "[Setup] Updated pg_hba.conf contents:"
-    cat "$PGDATA/pg_hba.conf"
-else
-    echo "[ERROR] pg_hba.conf not found. Aborting initialization."
-    exit 1
 fi
 
-# Reload PostgreSQL configuration to apply changes
-echo "[Setup] Reloading PostgreSQL configuration..."
-pg_ctl reload -D "$PGDATA"
+# Start PostgreSQL.
+echo "[Setup] Starting PostgreSQL for initialization..."
+pg_ctl -D "$PGDATA" -o "-c listen_addresses='*'" -w start
 
+# Wait for PostgreSQL to be ready.
 until pg_isready --username=postgres --host=localhost; do
+    echo "[Setup] Waiting for PostgreSQL to be ready..."
     sleep 2
 done
 
-echo "[Setup] Running database initialization..."
-psql --command="create database devaitest;"
-psql --command="alter database devaitest owner to postgres;"
+# Create database and extensions.
+echo "[Setup] Creating database and extensions..."
+psql --command="CREATE DATABASE devaitest;"
+psql --command="ALTER DATABASE devaitest OWNER TO postgres;"
+
+# Create topology schema first.
+psql --dbname=devaitest --command="CREATE SCHEMA IF NOT EXISTS topology;"
+
+# Create extensions.
 psql --dbname=devaitest <<EOF
-create extension if not exists postgis schema public;
-create extension if not exists postgis_raster schema public;
-create extension if not exists postgis_topology schema topology;
-create extension if not exists vector schema public;
-create extension if not exists pg_duckdb schema public;
+CREATE EXTENSION IF NOT EXISTS postgis SCHEMA public;
+CREATE EXTENSION IF NOT EXISTS postgis_raster SCHEMA public;
+CREATE EXTENSION IF NOT EXISTS postgis_topology SCHEMA topology;
+CREATE EXTENSION IF NOT EXISTS vector SCHEMA public;
+CREATE EXTENSION IF NOT EXISTS pg_duckdb SCHEMA public;
 EOF
 
-# Add pg_duckdb setting to postgresql.conf.
-echo "[Setup] Configuring pg_duckdb for devaitest..."
-echo "duckdb.motherduck_postgres_database = 'devaitest'" >> "$PGDATA/postgresql.conf"
+# Install and load DuckPGQ extension.
+echo "[Setup] Installing DuckPGQ extension..."
+psql --dbname=devaitest --command="SELECT duckdb.raw_query('INSTALL duckpgq FROM community;');"
+psql --dbname=devaitest --command="SELECT duckdb.raw_query('LOAD duckpgq;');"
 
-# Mark initialization as done
+# Mark initialization as done.
 touch "$LOCK_FILE"
-echo "[Setup] Initialization complete; PostgreSQL configured for trust authentication."
+echo "[Setup] Initialization complete."
 
-# Stop the temporary PostgreSQL server
+# Stop PostgreSQL.
+echo "[Setup] Stopping temporary PostgreSQL instance..."
 pg_ctl -D "$PGDATA" -m fast -w stop
 
-# Finally, start PostgreSQL in the foreground
+# Start PostgreSQL in foreground.
+echo "[Setup] Starting PostgreSQL in foreground..."
 exec postgres
