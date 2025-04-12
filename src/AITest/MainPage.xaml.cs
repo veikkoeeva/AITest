@@ -68,7 +68,7 @@ namespace AITest
         void OnMediaCaptureFailed(object sender, MediaCaptureFailedEventArgs e) =>
         Dispatcher.DispatchAsync(async () =>
         {
-            await DisplayAlert("Oops!", "Failed to capture image", "OK");
+            await DisplayAlertAsync("Oops!", "Failed to capture image", "OK");
             await GoToIdle();
         });
 

@@ -1,16 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-    <!-- This is for the purposes of visual CI build log inspection by a human. -->
-    <Target Name="PrintOSPlatform" BeforeTargets="Build">
-          <Message Importance="high" Text="Is OS Windows: $([MSBuild]::IsOSPlatform('windows'))" />
-          <Message Importance="high" Text="Is OS Linux: $([MSBuild]::IsOSPlatform('linux'))" />
-          <Message Importance="high" Text="Is OS MacOS: $([MSBuild]::IsOSPlatform('macos'))" />
-          <Message Importance="high" Text="Is OS MacCatalyst: $([MSBuild]::IsOSPlatform('maccatalyst'))" />
-    </Target>
+﻿<Project Sdk="Microsoft.NET.Sdk">   
 	<PropertyGroup>
          <!-- This set up is different from the default one so that it's possible to compile, test and eventually distribute Android on Ubuntu and Apple on Mac Catalyst. -->
-        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('linux'))">net9.0;net9.0-android</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('macos'))">net9.0;net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net9.0;net9.0-ios;net9.0-maccatalyst;net9.0-android;net9.0-windows10.0.22000.0</TargetFrameworks>
+        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('linux'))">net10.0;net10.0-android36</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('macos'))">net10.0;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net10.0;net10.0-ios;net10.0-maccatalyst;net10.0-android36;net10.0-windows10.0.22000.0</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net9.0-tizen</TargetFrameworks> -->
         
@@ -21,7 +14,7 @@
 		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
 		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
-		<OutputType Condition="'$(TargetFramework)' != 'net9.0'">Exe</OutputType>
+		<OutputType Condition="'$(TargetFramework)' != 'net10.0'">Exe</OutputType>
 		<RootNamespace>AITest</RootNamespace>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
@@ -43,10 +36,10 @@
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">35.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">34.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.22000.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.22000.0</TargetPlatformMinVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>		
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>			
 	</PropertyGroup>
 
 	<ItemGroup>

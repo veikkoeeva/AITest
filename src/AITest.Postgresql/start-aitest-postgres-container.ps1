@@ -50,6 +50,7 @@ if ($ExistingContainer) {
         --env POSTGRES_DB=postgres `
         --env POSTGRES_PASSWORD=userpassword `
         --env ALLOW_IP_RANGE="${AllowedIP}" `
+        --env POSTGRES_SHARED_PRELOAD_LIBRARIES=pg_duckdb `
         --publish "127.0.0.1:${Port}:5432" `
         --volume "${VolumeName}:/var/lib/postgresql/data" `
         --add-host host.docker.internal:host-gateway `

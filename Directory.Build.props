@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>preview</LangVersion>    
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -12,7 +12,7 @@
     <NoWarn>$(NoWarn);1591;SKEXP0070</NoWarn>    
     <EmbedUntrackedSources>true</EmbedUntrackedSources>   
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>    
-    <EnablePackageValidation>true</EnablePackageValidation>   
+    <EnablePackageValidation>true</EnablePackageValidation>
   </PropertyGroup>
   
 </Project>

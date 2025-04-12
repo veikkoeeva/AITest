@@ -23,7 +23,7 @@ env:
   GITHUB_USER: ${{ github.repository_owner }}
   ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
   ANDROID_HOME: ${{ github.workspace }}/android-sdk
-  ANDROID_API_LEVEL: 35
+  ANDROID_API_LEVEL: 36
 
 jobs:
   build:

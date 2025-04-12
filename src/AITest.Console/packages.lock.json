@@ -1,50 +1,58 @@
 {
   "version": 2,
   "dependencies": {
-    "net9.0": {
+    "net10.0": {
       "Microsoft.ML.OnnxRuntime": {
         "type": "Direct",
-        "requested": "[1.20.1, )",
-        "resolved": "1.20.1",
-        "contentHash": "NzUD79BC6R7TKROLyB3XCzXTpbNZ1YfOdVbult7hoFvd/xyRecOMiRO5HTzkPXvaFlcvZ91+WNCiroAPzUE7Dw==",
+        "requested": "[1.21.0, )",
+        "resolved": "1.21.0",
+        "contentHash": "1IN5rz0W7SFiVKblydIcCh0TVXDVbgTHdFGchjrH+vEtneRED7PL8RDcQOXE4FO3y10vvjg03LNubFTX74FCpA==",
         "dependencies": {
-          "Microsoft.ML.OnnxRuntime.Managed": "1.20.1"
+          "Microsoft.ML.OnnxRuntime.Managed": "1.21.0"
         }
       },
       "Microsoft.ML.OnnxRuntimeGenAI": {
         "type": "Direct",
-        "requested": "[0.6.0, )",
-        "resolved": "0.6.0",
-        "contentHash": "nvX9OAKYuUNQqwVFu0Sv43XMesTmUo7kXM71ytWiFthd0ki58cnv4RV7XWloWFbRNK8SqP8oR6H8oQ48nqDbMg==",
+        "requested": "[0.7.0, )",
+        "resolved": "0.7.0",
+        "contentHash": "V4EV+YGFb7qRAgTQ/r6gdV2ZDatmb7QME2/60ARSPKzT6yw07uPN+TBtijBVbVYeJHqVHGQAe9EypcSjWWrOPQ==",
         "dependencies": {
-          "Microsoft.ML.OnnxRuntime": "1.20.1",
-          "Microsoft.ML.OnnxRuntimeGenAI.Managed": "0.6.0"
+          "Microsoft.ML.OnnxRuntime": "1.21.0",
+          "Microsoft.ML.OnnxRuntimeGenAI.Managed": "0.7.0"
         }
       },
       "Microsoft.ML.OnnxRuntimeGenAI.Managed": {
         "type": "Direct",
-        "requested": "[0.6.0, )",
-        "resolved": "0.6.0",
-        "contentHash": "s5LXrWrrcUpMag651gPNHYk9UIb+5xJDq2Ld75iVvlMxg34T+9vYl7MaOx84gp2dfrrTd5FDPCqjp/wO4d5ulw=="
+        "requested": "[0.7.0, )",
+        "resolved": "0.7.0",
+        "contentHash": "bssyGUr7m3yuHzh38kNlrolm0/eH5+uYopg5WV+au7whsrY69XuthJd9GyVZrhaJpTO80F+amwWC2ozP1lFXlQ==",
+        "dependencies": {
+          "Microsoft.Extensions.AI.Abstractions": "9.3.0-preview.1.25161.3"
+        }
       },
       "System.Speech": {
         "type": "Direct",
-        "requested": "[9.0.2, )",
-        "resolved": "9.0.2",
-        "contentHash": "arQPudYrkW+cZfF7qyKcv9ukR7lM54AKyQDPX/2RPrC1EFlkYWHeOI6ST6VeI8hefW4zH9f/FnThuC70LFNd9A=="
+        "requested": "[10.0.0-preview.3.25171.5, )",
+        "resolved": "10.0.0-preview.3.25171.5",
+        "contentHash": "Xar+owhB50Ej587DTv6oAOjInrO9ueAEOaCdp3TwAh+fO7JIhJr5xwkG2bZ3OVBf05TiejUVrvFnW//sYUnOOg=="
+      },
+      "Microsoft.Extensions.AI.Abstractions": {
+        "type": "Transitive",
+        "resolved": "9.3.0-preview.1.25161.3",
+        "contentHash": "1BGoGmGQKwDOkf4I5/Ybt3GL5O+/3JPlZ/AM0uLspHn5DpPb2Wpi9HYKEMjTECFvW+pk+vtFaBYQmNdudl26fw=="
       },
       "Microsoft.ML.OnnxRuntime.Managed": {
         "type": "Transitive",
-        "resolved": "1.20.1",
-        "contentHash": "+EVcEcKdq3gkw6iu8TYl2coJxfPnMi1YQc6eZ80BGNlw6mbBCxNGe6h4udDCwENYWsXFvYjoBc6412t40tl4ew==",
+        "resolved": "1.21.0",
+        "contentHash": "Pp4PFhCELCMO8dWNbGK9Ge+Zh09xPVknmjvAgXIrLsfAgmv1It5aATP3UJTG/GBVzcvshDL/UI+KV9O8YQzkkQ==",
         "dependencies": {
-          "System.Memory": "4.5.5"
+          "System.Numerics.Tensors": "9.0.0"
         }
       },
-      "System.Memory": {
+      "System.Numerics.Tensors": {
         "type": "Transitive",
-        "resolved": "4.5.5",
-        "contentHash": "XIWiDvKPXaTveaB7HVganDlOCRoj03l+jrwNvcge/t8vhGYKvqV+dMv6G4SAX2NoNmN0wZfVPTAlFwZcZvVOUw=="
+        "resolved": "9.0.0",
+        "contentHash": "hyJB4UlpAi19Xr9AXzu2NuagKC4lPfHObNMEAA0HmqFz2rX7wKgzeYzO/jM/eBHDhnUGFFEjk5cOoJaxqg5J4A=="
       }
     }
   }

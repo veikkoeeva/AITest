@@ -1,8 +1,18 @@
 using AITest.API.Server.HealthCheck;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace AITest.API
 {
@@ -54,10 +64,15 @@ namespace AITest.API
                 .WithDescription("This endpoint returns a personalized greeting based on the provided name.")
                 .WithTags("Greetings");
                                     
-            app.MapPost("/chat", AIApi.HandleChatMessageAsync)
-                .WithSummary("Get a personalized AI information")
-                .WithDescription("This endpoint returns a personalized AI information.")
-                .WithTags("Greetings");
+            app.MapPost("/azurechat", AIApi.HandleChatMessageAzureAsync)
+                .WithSummary("Get a personalized AI generated information from Azure.")
+                .WithDescription("This endpoint returns a personalized AI generated information from Azure (not from a local model).")
+                .WithTags(["Personalized", "AI", "Azure"]);
+
+            app.MapPost("/localchat", AIApi.HandleChatMessageLocalAsync)
+                .WithSummary("Get a personalized AI generated information from a local model.")
+                .WithDescription("This endpoint returns a personalized AI generated information from a local model.")
+                .WithTags(["Personalized", "AI", "local", "onnx"]);
 
             app.MapGet("/openapi", IResult () =>
             {
@@ -179,8 +194,8 @@ namespace AITest.API
         {
             var loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
             //string? ollamaEndpoint = builder.Configuration["AI:Ollama:Endpoint"];
-            string? ollamaEndpoint = "http://localhost:11434";
-            string? ollamaModel = builder.Configuration["AI:Ollama:ChatModel"] ?? "llama3.1:latest";
+            var ollamaEndpoint = "http://localhost:11434";
+            var ollamaModel = builder.Configuration["AI:Ollama:ChatModel"] ?? "llama3.1:latest";
             if(!string.IsNullOrWhiteSpace(ollamaEndpoint))
             {
                 builder.Services.AddChatClient(new OllamaChatClient(ollamaEndpoint, ollamaModel))
