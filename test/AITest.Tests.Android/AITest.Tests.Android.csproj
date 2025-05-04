@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Appium.WebDriver" />
+    <PackageReference Include="Appium.WebDriver" />   
   </ItemGroup>
 
   <ItemGroup>
