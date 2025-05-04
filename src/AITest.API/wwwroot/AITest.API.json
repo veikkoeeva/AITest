@@ -1,67 +1,21 @@
 {
   "openapi": "3.1.1",
   "info": {
-    "title": "AITest.API | v1",
+    "title": "AI Test Server",
+    "description": "Friendly endpoints to test AI-powered interactions",
     "contact": {
       "name": "Test",
       "email": "support@test.org"
     },
     "version": "1.0.0"
   },
+  "servers": [
+    {
+      "url": "https://localhost:7211",
+      "description": "Local development server"
+    }
+  ],
   "paths": {
-    "/azurechat": {
-      "post": {
-        "tags": [
-          "Personalized",
-          "AI",
-          "Azure"
-        ],
-        "summary": "Get a personalized AI generated information from Azure.",
-        "description": "This endpoint returns a personalized AI generated information from Azure (not from a local model).",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChatMessage"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/localchat": {
-      "post": {
-        "tags": [
-          "Personalized",
-          "AI",
-          "local",
-          "onnx"
-        ],
-        "summary": "Get a personalized AI generated information from a local model.",
-        "description": "This endpoint returns a personalized AI generated information from a local model.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChatMessage"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/ai": {
       "get": {
         "tags": [
@@ -95,6 +49,75 @@
           }
         }
       }
+    },
+    "/chat/azure": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Chat with Azure-hosted model.",
+        "description": "Returns a personalized AI-generated response from the Azure-hosted model.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessage"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/local": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Chat with local model.",
+        "description": "Returns a personalized AI-generated response from the local model (e.g., ONNX).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatMessage"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/chat/responses": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "A chat message response.",
+        "description": "Streams a response token by token using Server-Sent Events.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -111,22 +134,10 @@
   },
   "tags": [
     {
-      "name": "Personalized"
-    },
-    {
-      "name": "AI"
-    },
-    {
-      "name": "Azure"
-    },
-    {
-      "name": "local"
-    },
-    {
-      "name": "onnx"
-    },
-    {
       "name": "Greetings"
+    },
+    {
+      "name": "Chat"
     }
   ]
 }

@@ -2,7 +2,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AITest.API.Server.HealthCheck
+namespace AITest.API.HealthCheck
 {
     public class SampleHealthCheckWithDI: IHealthCheck
     {

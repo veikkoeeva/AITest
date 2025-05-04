@@ -17,7 +17,7 @@ namespace AITest.API
         }
 
 
-        public static async Task<IResult> HandleChatMessageAzureAsync(
+        public static async Task<Ok<string>> HandleChatMessageAzureAsync(
             DTOs.ChatMessage chatMessage,
             [FromServices] IChatClient chatClient,
             [FromServices] List<ChatMessage> history, CancellationToken cancellationToken)
