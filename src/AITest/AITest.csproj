@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">   
 	<PropertyGroup>
          <!-- This set up is different from the default one so that it's possible to compile, test and eventually distribute Android on Ubuntu and Apple on Mac Catalyst. -->
-        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('linux'))">net10.0;net10.0-android36</TargetFrameworks>
+        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('linux'))">net10.0;net10.0-android</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('macos'))">net10.0;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net10.0;net10.0-ios;net10.0-maccatalyst;net10.0-android36;net10.0-windows10.0.22000.0</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net10.0;net10.0-ios;net10.0-maccatalyst;net10.0-android;net10.0-windows10.0.22000.0</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net9.0-tizen</TargetFrameworks> -->
         
@@ -42,6 +42,12 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>			
 	</PropertyGroup>
 
+    <!-- Remove once Microsoft.Maui.Controls and CommunityToolkit.Maui.Camera do not cause version version outside of dependency constraint errors. -->
+    <PropertyGroup>
+      <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1608</WarningsNotAsErrors>
+    </PropertyGroup>
+
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
@@ -64,6 +70,6 @@
 		<PackageReference Include="Microsoft.Maui.Controls" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" />
         <PackageReference Include="CommunityToolkit.Maui.Camera" />
-	</ItemGroup>
+	</ItemGroup>    
 
 </Project>

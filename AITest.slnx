@@ -1,0 +1,34 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="BannedSymbols.txt" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+    <File Path="spellcheckerexclusion.dic" />
+  </Folder>
+  <Folder Name="/Solution Items/.config/">
+    <File Path=".config/dotnet-tools.json" />
+  </Folder>
+  <Folder Name="/Solution Items/.github/" />
+  <Folder Name="/Solution Items/.github/workflows/">
+    <File Path=".github/workflows/main.yml" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/AITest.API/AITest.API.csproj" />
+    <Project Path="src/AITest.Console/AITest.Console.csproj" />
+    <Project Path="src/AITest.Database/AITest.Database.csproj" />
+    <Project Path="src/AITest.Web/AITest.Web.csproj" />
+    <Project Path="src/AITest/AITest.csproj" />
+    <Project Path="test/AITest.Benchmarks/AITest.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/AITest.Tests.Android/AITest.Tests.Android.csproj" />
+    <Project Path="test/AITest.Tests.Mac/AITest.Tests.Mac.csproj" />
+    <Project Path="test/AITest.Tests.Windows/AITest.Tests.Windows.csproj" />
+    <Project Path="test/AITest.Tests/AITest.Tests.csproj" />
+  </Folder>
+</Solution>

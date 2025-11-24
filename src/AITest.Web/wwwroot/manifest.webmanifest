@@ -1,6 +1,6 @@
 {
-  "name": "ArtificialIntelligence.Web",
-  "short_name": "ArtificialIntelligence.Web",
+  "name": "AITest.Web",
+  "short_name": "AITest.Web",
   "id": "./",
   "start_url": "./",
   "display": "standalone",

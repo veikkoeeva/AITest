@@ -1,4 +1,6 @@
-using AITest.API.Server.HealthCheck;
+using AITest.API.Features.Chat;
+using AITest.API.HealthCheck;
+using AITest.API.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -7,11 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
-using System;
+using Microsoft.OpenApi;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace AITest.API
@@ -38,7 +37,7 @@ namespace AITest.API
             You will then provide the information. You will also share what you think about potential bias in society and potential harms to natur.
             At the end of your response, ask if there is anything else you can help with.            
         """);
-        
+
 
         public static WebApplication InternalMain(WebApplication app)
         {
@@ -56,59 +55,17 @@ namespace AITest.API
 
             app.UseHttpsRedirection();
 
-            app.MapOpenApi();
+            app.MapOpenApi().CacheOutput();
 
             var aiApi = app.MapGroup("/ai");
             aiApi.MapGet("", AIApi.GetById)
                 .WithSummary("Get a personalized greeting")
                 .WithDescription("This endpoint returns a personalized greeting based on the provided name.")
                 .WithTags("Greetings");
-                                    
-            app.MapPost("/azurechat", AIApi.HandleChatMessageAzureAsync)
-                .WithSummary("Get a personalized AI generated information from Azure.")
-                .WithDescription("This endpoint returns a personalized AI generated information from Azure (not from a local model).")
-                .WithTags(["Personalized", "AI", "Azure"]);
 
-            app.MapPost("/localchat", AIApi.HandleChatMessageLocalAsync)
-                .WithSummary("Get a personalized AI generated information from a local model.")
-                .WithDescription("This endpoint returns a personalized AI generated information from a local model.")
-                .WithTags(["Personalized", "AI", "local", "onnx"]);
+            app.MapChatGroup().WithTags("Chat");
 
-            app.MapGet("/openapi", IResult () =>
-            {
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "openapi.html");
-                if(File.Exists(filePath))
-                {
-                    var fileContents = File.ReadAllText(filePath);
-                    return TypedResults.Content(fileContents, contentType: "text/html");
-                }
-                return TypedResults.NotFound("No file found with the supplied file name");
-            }).ExcludeFromDescription()/*.WithName("GetFileByName").RequireAuthorization("AuthenticatedUsers")*/;
-
-            app.MapGet($"{AssemblyName}.json", IResult () =>
-            {
-                var n = Assembly.GetExecutingAssembly().GetName().Name;
-                Console.Write(n);
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", $"{AssemblyName}.json");
-                if(File.Exists(filePath))
-                {
-                    var fileContents = File.ReadAllText(filePath);
-                    return TypedResults.Content(fileContents, contentType: "text/json");
-                }
-                return TypedResults.NotFound("No file found with the supplied file name");
-            }).ExcludeFromDescription()/*.WithName("GetFileByName").RequireAuthorization("AuthenticatedUsers")*/;
-
-            /*
-            app.Use(async (context, next) =>
-            {
-                if(context.Request.Path == "/WeatherForecast")
-                {
-                    await context.Response.WriteAsJsonAsync<List<WeatherForecast>>(new List<WeatherForecast>(new[] { new WeatherForecast() }));
-                    return;
-                }
-
-                await next(context);
-            });*/
+            app.MapDocumentation(AssemblyName);
 
             app.UseAntiforgery();
 
@@ -157,6 +114,23 @@ namespace AITest.API
                         Name = "Test",
                         Email = "support@test.org"
                     };
+                    return Task.CompletedTask;
+                });
+
+                options.AddDocumentTransformer((document, context, cancellationToken) =>
+                {
+                    document.Info.Title = "AI Test Server";
+                    document.Info.Description = "Friendly endpoints to test AI-powered interactions";
+
+                    document.Servers = new List<OpenApiServer>
+                    {
+                        new OpenApiServer
+                        {
+                            Url = "https://localhost:7211",
+                            Description = "Local development server"
+                        }
+                    };
+
                     return Task.CompletedTask;
                 });
             });
