@@ -1,158 +1,111 @@
 <#
 .SYNOPSIS
-    Creates and configures a Python virtual environment with Jupyter support.
+    Creates and configures a Python virtual environment with Jupyter support using uv.
 
 .DESCRIPTION
-    This script creates a Python 3.12 virtual environment, installs required packages,
-    and configures Jupyter notebook support. It performs the following tasks:
-    - Verifies Python 3.12 installation.
-    - Creates a virtual environment if it doesn't exist.
-    - Activates the virtual environment.
-    - Upgrades pip and setuptools.
-    - Installs and configures IPyKernel for Jupyter support.
+    This script uses uv to create a Python virtual environment and install dependencies.
+    uv is 10-100x faster than pip for package installation.
 
 .PARAMETER VenvPath
-    The path where the virtual environment will be created. Defaults to ".\venv".
+    The path where the virtual environment will be created. Defaults to ".\.venv".
+
+.PARAMETER PythonVersion
+    The Python version to use. Defaults to 3.13.
 
 .EXAMPLE
-    .\Setup-PythonVenv.ps1
-    Creates a virtual environment in the default location (.\venv)
+    .\setup-venv.ps1
 
 .EXAMPLE
-    .\Setup-PythonVenv.ps1 -VenvPath "C:\Projects\MyProject\venv"
-    Creates a virtual environment in the specified location.
+    .\setup-venv.ps1 -PythonVersion 3.12
 
 .NOTES
-    File Name      : Setup-PythonVenv.ps1
-    Author         : Veikko Eeva
-    Prerequisite   : PowerShell 5.1 or later
-    Requirements   : Python 3.12
-    Version        : 1.0.0
+    File Name      : setup-venv.ps1
+    Prerequisite   : uv must be installed (https://docs.astral.sh/uv/getting-started/installation/)
+    Version        : 3.0.0
 #>
 
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory=$false)]
-    [string]$VenvPath = ".\.venv"
+    [Parameter(Mandatory = $false)]
+    [string]$VenvPath = ".\.venv",
+
+    [Parameter(Mandatory = $false)]
+    [string]$PythonVersion = "3.13"
 )
 
-# Set strict mode for better error handling
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-function Test-PythonInstallation {
-    <#
-    .SYNOPSIS
-        Verifies that Python 3.12 is installed and accessible.
-    #>
+function Test-UvInstalled {
     try {
-        $pythonInfo = Get-Command "python" -ErrorAction Stop
-        $version = py -3.12 --version 2>&1
-        if ($version -notmatch "Python 3\.12") {
-            throw "Python 3.12 is required but found: $version"
-        }
-        Write-Verbose "Found $version at $($pythonInfo.Path)"
+        $null = Get-Command "uv" -ErrorAction Stop
         return $true
     }
     catch {
-        Write-Error "Python 3.12 is not properly installed: $_"
         return $false
     }
 }
 
-function New-VirtualEnvironment {
-    <#
-    .SYNOPSIS
-        Creates a new Python virtual environment if it doesn't exist.
-    #>
-    param (
-        [string]$Path
-    )
-    if (!(Test-Path $Path)) {
-        Write-Host "Creating Python virtual environment at: $Path" -ForegroundColor Cyan
-        try {
-            py -3.12 -m venv $Path
-        }
-        catch {
-            Write-Error "Failed to create virtual environment: $_"
-            exit 1
-        }
-    }
-    else {
-        Write-Host "Virtual environment already exists at: $Path" -ForegroundColor Yellow
+function Install-Uv {
+    Write-Host "Installing uv..." -ForegroundColor Cyan
+    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+    
+    # Add to PATH for current session (installer only updates permanent PATH)
+    $uvPath = "$env:USERPROFILE\.local\bin"
+    if (Test-Path $uvPath) {
+        $env:Path = "$uvPath;$env:Path"
     }
 }
-
-function Install-RequiredPackages {
-    <#
-    .SYNOPSIS
-        Installs and upgrades required Python packages in the virtual environment.
-    #>    
-    try {
-        Write-Host "Upgrading pip and setuptools..." -ForegroundColor Cyan
-        py -3.12 -m pip install --upgrade pip setuptools
-
-        Write-Host "Intalling IPyKernel..." -ForegroundColor Cyan
-        py -3.12 -m pip install ipykernel
-
-        Write-Host "Intalling pyproject.toml dependencies..." -ForegroundColor Cyan
-        py -3.12 -m pip install --editable .[dev] --verbose
-    }
-    catch {
-        Write-Error "Failed to install required packages: $_"
-        exit 1
-    }
-}
-
-function Register-JupyterKernel {
-    <#
-    .SYNOPSIS
-        Registers the virtual environment as a Jupyter kernel.
-    #>
-    Write-Host "Registering Jupyter kernel..." -ForegroundColor Cyan
-    try {
-        py -3.12 -m ipykernel install --user --name=venv --display-name "Python 3.12 (venv)"
-    }
-    catch {
-        Write-Error "Failed to register Jupyter kernel: $_"
-        exit 1
-    }
-}
-
 
 try {
-    Write-Host "Starting Python virtual environment setup..." -ForegroundColor Green
+    Write-Host "Starting Python virtual environment setup with uv..." -ForegroundColor Green
 
-    # Verify Python installation
-    if (-not (Test-PythonInstallation)) {
-        exit 1
+    # 1. Ensure uv is installed
+    if (-not (Test-UvInstalled)) {
+        Install-Uv
     }
-    
-    New-VirtualEnvironment -Path $VenvPath
-    
-    Write-Host "Activating virtual environment..." -ForegroundColor Cyan
-    $activateScript = Join-Path $VenvPath "Scripts\Activate.ps1"
-    if (Test-Path $activateScript) {
-        & $activateScript
-    }
-    else {
-        throw "Activation script not found at: $activateScript"
-    }
-    
-    Install-RequiredPackages
-    Register-JupyterKernel
 
-    # List installed packages to make it easier to verify installation visually.
-    Write-Host "Installed packages:" -ForegroundColor Cyan
-    py -3.12 -m pip list
+    $uvVersion = uv --version
+    Write-Host "Using $uvVersion" -ForegroundColor Cyan
 
-    Write-Host "Virtual environment setup completed successfully!" -ForegroundColor Green
+    # 2. Create venv with specified Python version (uv downloads Python if needed)
+    Write-Host "Creating virtual environment at: $VenvPath" -ForegroundColor Cyan
+    uv venv $VenvPath --python $PythonVersion
+
+    # 3. Install project dependencies (reads pyproject.toml automatically)
+    Write-Host "Installing project dependencies..." -ForegroundColor Cyan
+    uv sync --extra dev
+
+    # 4. Install ipykernel for Jupyter support
+    Write-Host "Installing ipykernel..." -ForegroundColor Cyan
+    uv pip install ipykernel
+
+    # 5. Register Jupyter kernel
+    $venvPython = Join-Path $VenvPath "Scripts\python.exe"
+    $kernelName = Split-Path -Leaf $VenvPath
+    if (-not $kernelName) { $kernelName = "venv" }
+    
+    $displayName = "Python $PythonVersion ($kernelName)"
+    Write-Host "Registering Jupyter kernel '$kernelName'..." -ForegroundColor Cyan
+    & $venvPython -m ipykernel install --user --name $kernelName --display-name $displayName
+
+    # 6. Show installed packages
+    Write-Host "`nInstalled packages:" -ForegroundColor Cyan
+    uv pip list
+
+    # 7. Activation hint
+    Write-Host ""
+    Write-Host "To activate this virtual environment:" -ForegroundColor Cyan
+    Write-Host "  . `"$VenvPath\Scripts\Activate.ps1`"" -ForegroundColor DarkCyan
+    Write-Host ""
+    Write-Host "Or use uv run to run commands directly:" -ForegroundColor Cyan
+    Write-Host "  uv run python your_script.py" -ForegroundColor DarkCyan
+    Write-Host "  uv run pytest" -ForegroundColor DarkCyan
+
+    Write-Host ""
+    Write-Host "Setup completed successfully!" -ForegroundColor Green
 }
 catch {
     Write-Error "An error occurred during setup: $_"
     exit 1
-}
-finally {
-    # Reset error action preference to default.
-    $ErrorActionPreference = "Continue"
 }

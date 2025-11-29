@@ -6,13 +6,13 @@ authors = [
     { name = "Veikko Eeva", email = "veikko_e@hotmail.com" }
 ]
 
-requires-python = "==3.12.8"
+requires-python = ">=3.13,<3.14"
 license = { text = "Apache-2.0" }
 
 dependencies = [    
     "onnxruntime-genai",
     "onnxruntime",
-# DirectML is a Windows only system. Trying to include it on a non-supported system will cause a dependency failure.
+    # DirectML is Windows only. Trying to include it on a non-supported system will cause a dependency failure.
     "olive-ai[cpu]; sys_platform != 'win32'",
     "olive-ai[cpu,directml]; sys_platform == 'win32'",
     "transformers",     
@@ -21,12 +21,12 @@ dependencies = [
     "torchvision",
     "opencv-python",
     "ipykernel",
-    "safetensors"
+    "safetensors",
+    "ipywidgets"
 ]
 
 [project.optional-dependencies]
 dev = [    
-    "pip-tools",    
     "types-requests",
     "types-setuptools",
     "pytest",
@@ -40,7 +40,6 @@ dev = [
     "huggingface-hub[cli]"
 ]
 
-
 [project.urls]
 Homepage = "https://github.com/veikkoeeva/AITest"
 Issues = "https://github.com/veikkoeeva/AITest/issues"
@@ -50,7 +49,7 @@ Documentation = "https://github.com/veikkoeeva/AITest"
 aitest = "main:main"
 
 [build-system]
-requires = ["setuptools>=75"]
+requires = ["setuptools>=80"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
@@ -59,7 +58,8 @@ packages = []
 [tool.pyright]
 typeCheckingMode = "strict"
 include = ["./**/*"]
-exclude = ["**/cache",
+exclude = [
+    "**/cache",
     "**/__pycache__",
     "src/converted"
 ]
@@ -69,7 +69,7 @@ verboseOutput = true
 extraPaths = ["./src/**/*"]
 
 executionEnvironments = [
-  { root = ".", pythonVersion = "3.12", reportMissingImports = "warning" }
+  { root = ".", pythonVersion = "3.13", reportMissingImports = "warning" }
 ]
 
 [tool.pytest.ini_options]
@@ -77,9 +77,7 @@ minversion = "8.3"
 addopts = "-v --strict-markers"
 testpaths = ["tests"]
 pythonpath = ["."]
-# python_files = ["/**/*/test_*.py"]
 python_functions = ["test_*"]
-
 
 [tool.coverage.report]
 fail_under = 80
