@@ -2,7 +2,7 @@
     "python.languageServer": "Pylance",
     "editor.semanticHighlighting.enabled": true,
     "python-envs.defaultEnvManager": "ms-python.python:venv",
-    "python-envs.defaultPackageManager": "ms-python.python:pip",  
+    "python-envs.defaultPackageManager": "ms-python.python:uv",
     "omnisharp.enableAsyncCompletion": true,
     "omnisharp.useModernNet": true,
     "interactiveWindow.collapseCellInputCode": "always",

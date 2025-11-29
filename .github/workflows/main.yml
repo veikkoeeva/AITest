@@ -7,11 +7,15 @@ on:
       - main
   pull_request:
     paths-ignore:
-      - "**.md"  
+      - "**.md"
   schedule:
     - cron: "0 0 * * *"
 
-env:    
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
   DOTNET_ENVIRONMENT: CI
   BUILD_CONFIGURATION: Release
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -24,6 +28,8 @@ env:
   ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
   ANDROID_HOME: ${{ github.workspace }}/android-sdk
   ANDROID_API_LEVEL: 36
+  PYTHON_PROJECT_PATH: src/AITest.PythonAI
+  UV_CACHE_DIR: ${{ github.workspace }}/.uv-cache
 
 jobs:
   build:
@@ -35,169 +41,120 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           fetch-tags: true
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@87b7050bc53ea08284295505d98d2aa94301e852
+        uses: actions/setup-dotnet@v4
         with:
           cache: true
           cache-dependency-path: '**/packages.lock.json'
           global-json-file: global.json
-      
-      - name: Set up Python AITest.PythonAI        
-        id: setup_python
-        uses: actions/setup-python@v5
-        with:          
-          python-version-file: 'src/AITest.PythonAI/pyproject.toml'
-            
-      - name: Restore cached virtualenv for AITest.PythonAI
-        uses: actions/cache/restore@v4
-        with:
-          key: "venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('src/AITest.PythonAI/pyproject.toml') }}"
-          path: 'src/AITest.PythonAI/.venv'
-    
-      - name: Install dependencies for AITest.PythonAI (Linux and macOS)
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'      
-        run: |
-          python -m venv src/AITest.PythonAI/.venv
-          source src/AITest.PythonAI/.venv/bin/activate
-          python -m pip install --upgrade pip setuptools
-          cd src/AITest.PythonAI/
-          pip install ".[dev]" --no-build-isolation --verbose
-          echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
-          echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
-      
-      - name: Install dependencies for AITest.PythonAI (Windows)
-        if: matrix.os == 'windows-latest'       
-        run: |
-          python -m venv src/AITest.PythonAI/.venv
-          src/AITest.PythonAI/.venv/Scripts/Activate.ps1
-          python -m pip install --upgrade pip setuptools
-          cd src/AITest.PythonAI/
-          pip install ".[dev]" --no-build-isolation --verbose
-          echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
-          echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
 
-      - name: Saved cached virtualenv for AITest.PythonAI
-        uses: actions/cache/save@v4
+      - name: Setup Python with uv
+        uses: astral-sh/setup-uv@v4
         with:
-          key: "venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('src/AITest.PythonAI/pyproject.toml') }}"
-          path: 'src/AITest.PythonAI/.venv'
-      
-      - name: Install NodeJS on ${{ matrix.os }}
+          enable-cache: true
+          cache-dependency-glob: '${{ env.PYTHON_PROJECT_PATH }}/uv.lock'
+
+      - name: Install Python dependencies
+        working-directory: ${{ env.PYTHON_PROJECT_PATH }}
+        run: uv sync --extra dev
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: './test/package.json'
+          cache: 'npm'
+          cache-dependency-path: './test/package-lock.json'
 
-      - name: Install Appium Node packages on ${{ matrix.os }}
+      - name: Install Appium packages
+        working-directory: './test'
         run: npm ci
-        working-directory: './test'
 
-      - name: List Appium drivers on ${{ matrix.os }}
-        run: npm run list:drivers
+      - name: List Appium drivers
         working-directory: './test'
-      
+        run: npm run list:drivers
+
       - name: Update workload manifests
-        shell: bash
-        run: |
-          dotnet workload config --update-mode manifests
-      
+        run: dotnet workload config --update-mode manifests
+
       - name: Restore local .NET tools
         run: dotnet tool restore
 
-      - name: Install platform-specific .NET dependencies on ${{ matrix.os }}
-        shell: bash        
+      - name: Setup Android SDK (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
         run: |
-          if [[ ${{ matrix.os }} == 'ubuntu-latest' ]]; then            
-            # Install OpenJDK and set JAVA_HOME
-            sudo apt-get update
-            sudo apt-get install -y openjdk-21-jdk
-            export JAVA_HOME='/usr/lib/jvm/java-21-openjdk-amd64'
-            echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+          sudo apt-get update && sudo apt-get install -y openjdk-21-jdk
+          echo "JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64" >> "$GITHUB_ENV"
+          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
+          curl -fsSL "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip" -o android-cmdline-tools.zip
+          unzip -q android-cmdline-tools.zip && mv cmdline-tools "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$ANDROID_SDK_ROOT/platform-tools" >> "$GITHUB_PATH"
+          mkdir -p "$ANDROID_SDK_ROOT/licenses"
+          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_SDK_ROOT/licenses/android-sdk-license"
+          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_SDK_ROOT/licenses/android-sdk-license"
+          echo "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_SDK_ROOT/licenses/android-sdk-preview-license"
+          "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-$ANDROID_API_LEVEL" "build-tools;$ANDROID_API_LEVEL.0.0"
 
-            # Create Android SDK directory with proper permissions
-            sudo mkdir -p $ANDROID_SDK_ROOT
-            sudo chown -R $USER:$USER $ANDROID_SDK_ROOT
+      - name: Install .NET workloads (Linux)
+        if: runner.os == 'Linux'
+        run: dotnet workload install maui-android
 
-            # Download and extract Android Command Line Tools
-            wget -q "https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip" -O android-cmdline-tools.zip
-            unzip -q android-cmdline-tools.zip
-            mkdir -p $ANDROID_SDK_ROOT/cmdline-tools/latest
-            mv cmdline-tools/* $ANDROID_SDK_ROOT/cmdline-tools/latest/
-            
-            # Add Android SDK tools to PATH
-            echo "PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH" >> $GITHUB_ENV
+      - name: Install .NET workloads (Windows)
+        if: runner.os == 'Windows'
+        run: dotnet workload install maui
 
-            # Accept Android SDK licenses by creating license files with known SHA-1 hash values.
-            # These hashes represent acceptance of the licensing terms during automated CI setup.
-            # `android-sdk-license` file contains hashes for standard SDK components:
-            #   - base/main SDK license
-            #   - additional SDK components license
-            mkdir -p $ANDROID_SDK_ROOT/licenses
-            echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_SDK_ROOT/licenses/android-sdk-license"
-            echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_SDK_ROOT/licenses/android-sdk-license"
-            echo "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_SDK_ROOT/licenses/android-sdk-preview-license"
-
-            # Install required packages
-            $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
-              "platform-tools" \
-              "platforms;android-${ANDROID_API_LEVEL}" \
-              "build-tools;${ANDROID_API_LEVEL}.0.0"              
-            
-            # Install Android workload
-            dotnet workload install maui-android
-            # npm --prefix ./test run install:drivers:linux
-          elif [[ ${{ matrix.os }} == 'windows-latest' ]]; then            
-            dotnet workload install maui
-            
-            # On Windows it's possible to test both Windows and Android.
-            # npm --prefix ./test run install:drivers:windows            
-          elif [[ ${{ matrix.os }} == 'macos-latest' ]]; then
-            sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
-            sudo xcodebuild -license accept
-            dotnet workload install maui-ios
-            dotnet workload install maui-maccatalyst
-                        
-            # npm --prefix ./test run install:drivers:macos     
-          fi
-      
-      - name: Test AITest.PythonAI (Windows)
-        if: matrix.os == 'windows-latest'
+      - name: Install .NET workloads (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
         run: |
-          cd src/AITest.PythonAI/
-          .venv/Scripts/Activate.ps1
-          python -m pytest --cov-report=xml --cov-report=term-missing --cov-report=html tests/
+          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+          sudo xcodebuild -license accept
+          dotnet workload install maui-ios maui-maccatalyst
 
-      - name: Test AITest.PythonAI (Linux and macOS)
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+      - name: Test Python project
+        working-directory: ${{ env.PYTHON_PROJECT_PATH }}
+        run: uv run pytest --cov=src --cov-report=xml --cov-report=term-missing --cov-report=html tests/
+
+      - name: Build .NET
+        run: dotnet build --configuration ${{ env.BUILD_CONFIGURATION }}
+
+      - name: Test .NET
+        run: dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --no-restore
+
+      - name: Generate SBOM (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: mkdir -p "${{ github.workspace }}/sbom/${{ matrix.os }}" && dotnet tool run sbom-tool generate -DeleteManifestDirIfPresent true -BuildDropPath "${{ github.workspace }}/sbom/${{ matrix.os }}" -FetchLicenseInformation true -EnablePackageMetadataParsing true -BuildComponentPath . -PackageName "AITest" -PackageSupplier "VeikkoEeva" -NamespaceUriBase "https://aitest.xyz/aitest" -PackageVersion 1.0.0 -Verbosity Verbose
+
+      - name: Generate SBOM (Windows)
+        if: runner.os == 'Windows'
         run: |
-          cd src/AITest.PythonAI/
-          source .venv/bin/activate
-          python -m pytest --cov-report=xml --cov-report=term-missing --cov-report=html tests/
+          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/sbom/${{ matrix.os }}"
+          dotnet tool run sbom-tool generate -DeleteManifestDirIfPresent true -BuildDropPath "${{ github.workspace }}/sbom/${{ matrix.os }}" -FetchLicenseInformation true -EnablePackageMetadataParsing true -BuildComponentPath . -PackageName "AITest" -PackageSupplier "VeikkoEeva" -NamespaceUriBase "https://aitest.xyz/aitest" -PackageVersion 1.0.0 -Verbosity Verbose
 
-      - name: Build and test .NET on Linux (Android)
-        if: matrix.os == 'ubuntu-latest'
-        run: |          
-          dotnet build --configuration ${{ env.BUILD_CONFIGURATION }}
-          dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}
+          path: |
+            ${{ env.PYTHON_PROJECT_PATH }}/htmlcov/
+            ${{ env.PYTHON_PROJECT_PATH }}/coverage.xml
+            **/TestResults/
+          retention-days: 7
 
-      - name: Build and test .NET on Windows (all)
-        if: matrix.os == 'windows-latest'
-        run: |          
-          dotnet build --configuration ${{ env.BUILD_CONFIGURATION }}
-          dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ matrix.os }}
+          path: ${{ github.workspace }}/sbom/${{ matrix.os }}/
+          retention-days: 30
 
-      - name: Build and test .NET on macOS (MacCatalyst, iOS)
-        if: matrix.os == 'macos-latest'
-        run: |          
-          dotnet build --configuration ${{ env.BUILD_CONFIGURATION }}
-          dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
-
-      - name: Create SBOM output directory
-        run: mkdir -p "${{ github.workspace }}/${{ matrix.os }}/sbom/"
-
-      - name: Run .NET BOM analysis
-        run: dotnet tool run sbom-tool generate -DeleteManifestDirIfPresent true -BuildDropPath "${{ github.workspace }}/${{ matrix.os }}/sbom/" -FetchLicenseInformation true -EnablePackageMetadataParsing true -BuildComponentPath . -PackageName "AITest" -PackageSupplier "VeikkoEeva" -NamespaceUriBase "https://aitest.xyz/aitest" -PackageVersion 1.0.0 -Verbosity Verbose
+      - name: Prune uv cache
+        if: always()
+        run: uv cache prune --ci
