@@ -41,20 +41,20 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@71cf2267d89c5cb81562390fa70a37fa40b1305e
         with:
           fetch-depth: 0
           fetch-tags: true
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
         with:
           cache: true
           cache-dependency-path: '**/packages.lock.json'
           global-json-file: global.json
 
       - name: Setup Python with uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@1e862dfacbd1d6d858c55d9b792c756523627244
         with:
           enable-cache: true
           cache-dependency-glob: '${{ env.PYTHON_PROJECT_PATH }}/uv.lock'
@@ -64,7 +64,7 @@ jobs:
         run: uv sync --extra dev
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
           node-version-file: './test/package.json'
           cache: 'npm'
@@ -127,19 +127,44 @@ jobs:
       - name: Test .NET
         run: dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --no-restore
 
-      - name: Generate SBOM (Linux/macOS)
+      - name: Create SBOM directory (Linux/macOS)
         if: runner.os != 'Windows'
-        run: mkdir -p "${{ github.workspace }}/sbom/${{ matrix.os }}" && dotnet tool run sbom-tool generate -DeleteManifestDirIfPresent true -BuildDropPath "${{ github.workspace }}/sbom/${{ matrix.os }}" -FetchLicenseInformation true -EnablePackageMetadataParsing true -BuildComponentPath . -PackageName "AITest" -PackageSupplier "VeikkoEeva" -NamespaceUriBase "https://aitest.xyz/aitest" -PackageVersion 1.0.0 -Verbosity Verbose
+        run: mkdir -p "${{ github.workspace }}/sbom/${{ matrix.os }}"
 
-      - name: Generate SBOM (Windows)
+      - name: Create SBOM directory (Windows)
         if: runner.os == 'Windows'
-        run: |
-          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/sbom/${{ matrix.os }}"
-          dotnet tool run sbom-tool generate -DeleteManifestDirIfPresent true -BuildDropPath "${{ github.workspace }}/sbom/${{ matrix.os }}" -FetchLicenseInformation true -EnablePackageMetadataParsing true -BuildComponentPath . -PackageName "AITest" -PackageSupplier "VeikkoEeva" -NamespaceUriBase "https://aitest.xyz/aitest" -PackageVersion 1.0.0 -Verbosity Verbose
+        run: New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/sbom/${{ matrix.os }}"
+
+      - name: Generate .NET SBOM
+        run: dotnet tool run sbom-tool generate -DeleteManifestDirIfPresent true -BuildDropPath "${{ github.workspace }}/sbom/${{ matrix.os }}" -FetchLicenseInformation true -EnablePackageMetadataParsing true -BuildComponentPath . -PackageName "AITest" -PackageSupplier "VeikkoEeva" -NamespaceUriBase "https://aitest.xyz/aitest" -PackageVersion 1.0.0 -Verbosity Verbose
+
+      - name: Export Python dependencies for SBOM
+        working-directory: ${{ env.PYTHON_PROJECT_PATH }}
+        run: uv export --format requirements-txt --no-hashes -o "${{ github.workspace }}/sbom/${{ matrix.os }}/python-requirements.txt"
+
+      - name: Generate Python SBOM (Linux/macOS)
+        if: runner.os != 'Windows'
+        working-directory: ${{ env.PYTHON_PROJECT_PATH }}
+        run: uv pip list --format json > "${{ github.workspace }}/sbom/${{ matrix.os }}/python-packages.json"
+
+      - name: Generate Python SBOM (Windows)
+        if: runner.os == 'Windows'
+        working-directory: ${{ env.PYTHON_PROJECT_PATH }}
+        run: uv pip list --format json | Out-File -FilePath "${{ github.workspace }}/sbom/${{ matrix.os }}/python-packages.json" -Encoding utf8
+
+      - name: Generate Node.js SBOM (Linux/macOS)
+        if: runner.os != 'Windows'
+        working-directory: './test'
+        run: npm run sbom && cp sbom/node-sbom.cdx.json "${{ github.workspace }}/sbom/${{ matrix.os }}/"
+
+      - name: Generate Node.js SBOM (Windows)
+        if: runner.os == 'Windows'
+        working-directory: './test'
+        run: npm run sbom; Copy-Item sbom/node-sbom.cdx.json "${{ github.workspace }}/sbom/${{ matrix.os }}/"
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: test-results-${{ matrix.os }}
           path: |
@@ -149,7 +174,7 @@ jobs:
           retention-days: 7
 
       - name: Upload SBOM
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: sbom-${{ matrix.os }}
           path: ${{ github.workspace }}/sbom/${{ matrix.os }}/
