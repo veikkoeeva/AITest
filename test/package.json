@@ -5,14 +5,18 @@
   "description": "AITest package list for device Appium Tests",
   "private": true,
   "engines": {
-    "node": ">=23.11.0"
+    "node": "25.2.1"
   },
   "devDependencies": {
-    "appium": "2.18.0",
-    "appium-mac2-driver": "2.2.2",
-    "appium-uiautomator2-driver": "^4.2.3",
-    "appium-windows-driver": "^4.4.1",
-    "appium-xcuitest-driver": "9.2.4"
+    "@cyclonedx/cyclonedx-npm": "^4.1.1",
+    "appium": "3.1.1",
+    "appium-mac2-driver": "^3.2.8",
+    "appium-uiautomator2-driver": "^6.4.1",
+    "appium-windows-driver": "^5.1.1",
+    "appium-xcuitest-driver": "^10.9.0",
+    "@types/node": "24.10.1",
+    "undici-types": "7.16.0",
+    "typescript": "5.9.3"
   },
   "scripts": {
     "list:drivers": "npx appium driver list",
@@ -24,6 +28,7 @@
     "update:drivers:macos": "npx appium driver update xcuitest && npx appium driver update mac2",
     "install:drivers": "npm run install:drivers:linux && (npm run install:drivers:windows || true) && (npm run install:drivers:macos || true)",
     "update:drivers": "npm run update:drivers:linux && (npm run update:drivers:windows || true) && (npm run update:drivers:macos || true)",
+    "sbom": "npx @cyclonedx/cyclonedx-npm --output-file sbom/node-sbom.cdx.json",
     "test": "npx appium --port 4723"
   }
 }
