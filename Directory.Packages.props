@@ -6,29 +6,29 @@
   <ItemGroup>
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="dotNetRdf" Version="3.3.0" />
-    <PackageVersion Include="Microsoft.ML.OnnxRuntimeGenAI.Managed" Version="0.11.2" />
-    <PackageVersion Include="Microsoft.ML.OnnxRuntimeGenAI" Version="0.11.2" />
+    <PackageVersion Include="Microsoft.ML.OnnxRuntimeGenAI.Managed" Version="0.11.3" />
+    <PackageVersion Include="Microsoft.ML.OnnxRuntimeGenAI" Version="0.11.3" />
     <PackageVersion Include="Microsoft.ML.OnnxRuntime" Version="1.23.2" />
     <PackageVersion Include="Microsoft.ML.Probabilistic" Version="0.4.2504.701" />
     <PackageVersion Include="Microsoft.ML.Probabilistic.Learners" Version="0.4.2504.701" />
     <PackageVersion Include="DuckDB.NET.Bindings.Full" Version="1.1.3" />
     <PackageVersion Include="ModelContextProtocol.AspNetCore" Version="0.1.0-preview.11" />
-    <PackageVersion Include="System.Speech" Version="10.0.0" />
+    <PackageVersion Include="System.Speech" Version="10.0.1" />
     <PackageVersion Include="CsCheck" Version="4.1.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.1" />
     <PackageVersion Include="System.Net.ServerSentEvents" Version="10.0.0-preview.3.25171.5" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.1" />
     <PackageVersion Include="Appium.WebDriver" Version="8.0.1" />
     <PackageVersion Include="Microsoft.Extensions.AI.AzureAIInference" Version="9.3.0-preview.1.25114.11" />
     <PackageVersion Include="Microsoft.Extensions.AI.Ollama" Version="9.4.3-preview.1.25230.7" />
     <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.0.1-preview.1.25571.5" />
     <PackageVersion Include="Azure.Identity" Version="1.13.2" />
-    <PackageVersion Include="Microsoft.SemanticKernel" Version="1.67.1" />
-    <PackageVersion Include="Microsoft.Extensions.AI" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.SemanticKernel" Version="1.68.0" />
+    <PackageVersion Include="Microsoft.Extensions.AI" Version="10.1.0" />
     <PackageVersion Include="Microsoft.Maui.Controls" Version="10.0.11" />
     <PackageVersion Include="CommunityToolkit.Maui.Camera" Version="5.0.0" />
   </ItemGroup>
