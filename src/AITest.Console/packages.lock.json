@@ -13,28 +13,28 @@
       },
       "Microsoft.ML.OnnxRuntimeGenAI": {
         "type": "Direct",
-        "requested": "[0.11.2, )",
-        "resolved": "0.11.2",
-        "contentHash": "CX0ksIiOTxwIVZg/Prpm2f4n/H29S0fW1eBhXdAhgsJVco7RhE/BJFuUZwSd0/LNUzDeYMkflcfouNfmeZpkzw==",
+        "requested": "[0.11.3, )",
+        "resolved": "0.11.3",
+        "contentHash": "TXzZl3rEkplhPeIZZKQBvnWIqHKPOQqyCD5DNpF4BC80byzwACf7ytxiSvVHKfKWFcKroW29Bm9mkBP7o3FOBA==",
         "dependencies": {
           "Microsoft.ML.OnnxRuntime": "1.23.2",
-          "Microsoft.ML.OnnxRuntimeGenAI.Managed": "0.11.2"
+          "Microsoft.ML.OnnxRuntimeGenAI.Managed": "0.11.3"
         }
       },
       "Microsoft.ML.OnnxRuntimeGenAI.Managed": {
         "type": "Direct",
-        "requested": "[0.11.2, )",
-        "resolved": "0.11.2",
-        "contentHash": "MJDJkScxET1xyKZdloXOaYaX9T7apH8UyVszp1E6ANMX/BBVwNwITCsWbvhF9ZrEwgYzw5I2kayqjHYFgMyEJA==",
+        "requested": "[0.11.3, )",
+        "resolved": "0.11.3",
+        "contentHash": "ncA2k9W7BoRHcAHvvnbIMBsQnzCgERDxNGt7XRBdo0AACs0MrwnNDXyDzMZlKMr8aDW4ZQFvm0+8soo3w4KLsQ==",
         "dependencies": {
           "Microsoft.Extensions.AI.Abstractions": "9.8.0"
         }
       },
       "System.Speech": {
         "type": "Direct",
-        "requested": "[10.0.0, )",
-        "resolved": "10.0.0",
-        "contentHash": "nHlCdjoeReiSx4kzgPEwPRlbOAyuVFwndXTZZT+CLnHb8UIfB+YMgpQjQ7faYvs3xU8wyvpb6dt+U+HwdlbG7w=="
+        "requested": "[10.0.1, )",
+        "resolved": "10.0.1",
+        "contentHash": "Sra5Gv7qcZzLuQW4alVglQpnDgJiqeGmbwz8WLZa1QdqmTo4bi7FYQP5CJAzlwLDcmHrBS2L7+W6HqFT14HBTA=="
       },
       "Microsoft.Extensions.AI.Abstractions": {
         "type": "Transitive",
